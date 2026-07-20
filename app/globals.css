@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: #f5f6f8;
+  color: #1f2430;
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Espaço no rodapé para a barra de navegação móvel não cobrir conteúdo */
+.pb-nav {
+  padding-bottom: 84px;
+}
+
+/* Área tocável mínima (48px) para móvel */
+.toque {
+  min-height: 48px;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px; /* evita zoom automático no iOS */
+}
+
+@keyframes toast-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.toast-in { animation: toast-in 0.18s ease-out; }
