@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { Plus, Check, Clock, AlertTriangle } from "lucide-react";
+import { Plus, Check, Clock, AlertTriangle, Pencil, Trash2 } from "lucide-react";
 import SeletorMes from "../../components/SeletorMes";
 import Modal from "../../components/Modal";
 import { useToast } from "../../components/Toast";
@@ -20,6 +20,8 @@ export default function Pendencias() {
   const [lista, setLista] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [novo, setNovo] = useState(null); // { tipo }
+  const [editando, setEditando] = useState(null); // pendência sendo editada
+  const [excluindo, setExcluindo] = useState(null); // pendência aguardando confirmação
 
   const carregar = useCallback(async () => {
     if (!supabaseConfigurado) {
@@ -50,6 +52,18 @@ export default function Pendencias() {
     try {
       await atualizarPendencia(p.id, { status: novoStatus });
       toast(`✓ Marcado como ${rotulo}`);
+      carregar();
+    } catch (e) {
+      toast("Erro: " + e.message, "erro");
+    }
+  }
+
+  async function confirmarExclusao() {
+    const p = excluindo;
+    try {
+      await deletarPendencia(p.id);
+      toast("✓ Pendência excluída");
+      setExcluindo(null);
       carregar();
     } catch (e) {
       toast("Erro: " + e.message, "erro");
@@ -88,6 +102,8 @@ export default function Pendencias() {
                 : { txt: "⚠️ Pendente", cls: "text-yellow-600", Icone: AlertTriangle }
             }
             acao={p.status !== "pago" ? { txt: "Marcar como Pago", fn: () => marcar(p) } : null}
+            onEditar={() => setEditando(p)}
+            onExcluir={() => setExcluindo(p)}
           />
         )}
       />
@@ -112,16 +128,35 @@ export default function Pendencias() {
             acao={
               p.status !== "recebido" ? { txt: "Marcar como Recebido", fn: () => marcar(p) } : null
             }
+            onEditar={() => setEditando(p)}
+            onExcluir={() => setExcluindo(p)}
           />
         )}
       />
 
       {novo && (
-        <NovaPendencia
+        <FormPendencia
           tipo={novo.tipo}
           mes={mes}
           onFechar={() => setNovo(null)}
           onSalvo={carregar}
+        />
+      )}
+
+      {editando && (
+        <FormPendencia
+          pendencia={editando}
+          mes={mes}
+          onFechar={() => setEditando(null)}
+          onSalvo={carregar}
+        />
+      )}
+
+      {excluindo && (
+        <ConfirmarExclusao
+          pendencia={excluindo}
+          onConfirmar={confirmarExclusao}
+          onCancelar={() => setExcluindo(null)}
         />
       )}
     </div>
@@ -145,7 +180,7 @@ function Secao({ titulo, cor, onNovo, itens, carregando, render }) {
   );
 }
 
-function Cartao({ p, corValor, status, acao }) {
+function Cartao({ p, corValor, status, acao, onEditar, onExcluir }) {
   const Icone = status.Icone;
   return (
     <div className="bg-white rounded-xl border border-neutral-200 p-3">
@@ -158,24 +193,49 @@ function Cartao({ p, corValor, status, acao }) {
           {Icone && <Icone size={15} />} {status.txt}
         </span>
       </div>
-      {acao && (
+      <div className="mt-3 flex items-center gap-2">
+        {acao && (
+          <button
+            onClick={acao.fn}
+            className="flex-1 flex items-center justify-center gap-1 bg-marca text-white rounded-lg py-2 toque"
+          >
+            <Check size={16} /> {acao.txt}
+          </button>
+        )}
         <button
-          onClick={acao.fn}
-          className="mt-3 w-full flex items-center justify-center gap-1 bg-marca text-white rounded-lg py-2 toque"
+          onClick={onEditar}
+          aria-label={`Editar ${p.descricao}`}
+          className={`${acao ? "" : "ml-auto"} flex items-center justify-center gap-1 border border-neutral-300 text-neutral-600 rounded-lg py-2 px-3 toque`}
         >
-          <Check size={16} /> {acao.txt}
+          <Pencil size={16} /> {!acao && <span className="text-sm">Editar</span>}
         </button>
-      )}
+        <button
+          onClick={onExcluir}
+          aria-label={`Excluir ${p.descricao}`}
+          className="flex items-center justify-center gap-1 border border-neutral-300 text-despesa rounded-lg py-2 px-3 toque"
+        >
+          <Trash2 size={16} /> {!acao && <span className="text-sm">Excluir</span>}
+        </button>
+      </div>
     </div>
   );
 }
 
-function NovaPendencia({ tipo, mes, onFechar, onSalvo }) {
+function FormPendencia({ pendencia, tipo, mes, onFechar, onSalvo }) {
   const toast = useToast();
-  const [descricao, setDescricao] = useState("");
-  const [valor, setValor] = useState("");
+  const editando = Boolean(pendencia);
+  const tipoFinal = pendencia?.tipo ?? tipo;
+  const [descricao, setDescricao] = useState(pendencia?.descricao ?? "");
+  const [valor, setValor] = useState(
+    pendencia ? String(Math.abs(Number(pendencia.valor) || 0)) : ""
+  );
   const [salvando, setSalvando] = useState(false);
-  const titulo = tipo === "a_pagar" ? "Nova conta a pagar" : "Novo valor a receber";
+
+  const titulo = editando
+    ? "Editar pendência"
+    : tipoFinal === "a_pagar"
+      ? "Nova conta a pagar"
+      : "Novo valor a receber";
 
   async function salvar() {
     if (!descricao || !valor) {
@@ -184,14 +244,22 @@ function NovaPendencia({ tipo, mes, onFechar, onSalvo }) {
     }
     setSalvando(true);
     try {
-      await criarPendencia({
-        descricao,
-        tipo,
-        valor: Number(valor) || 0,
-        status: "pendente",
-        mes_referencia: mes,
-      });
-      toast("✓ Pendência criada");
+      if (editando) {
+        await atualizarPendencia(pendencia.id, {
+          descricao,
+          valor: Number(valor) || 0,
+        });
+        toast("✓ Pendência atualizada");
+      } else {
+        await criarPendencia({
+          descricao,
+          tipo: tipoFinal,
+          valor: Number(valor) || 0,
+          status: "pendente",
+          mes_referencia: mes,
+        });
+        toast("✓ Pendência criada");
+      }
       onSalvo?.();
       onFechar();
     } catch (e) {
@@ -239,5 +307,28 @@ function NovaPendencia({ tipo, mes, onFechar, onSalvo }) {
         />
       </label>
     </Modal>
+  );
+}
+
+function ConfirmarExclusao({ pendencia, onConfirmar, onCancelar }) {
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl p-5 max-w-sm w-full">
+        <h3 className="font-semibold mb-2">Excluir pendência?</h3>
+        <p className="text-sm text-neutral-600 mb-4">
+          <strong>{pendencia.descricao}</strong> — {formatBRL(Math.abs(pendencia.valor))}
+          <br />
+          Isso não pode ser desfeito.
+        </p>
+        <div className="flex justify-end gap-2">
+          <button onClick={onCancelar} className="px-4 py-2 rounded-lg border border-neutral-300 toque">
+            Cancelar
+          </button>
+          <button onClick={onConfirmar} className="px-4 py-2 rounded-lg bg-despesa text-white toque">
+            Excluir
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
