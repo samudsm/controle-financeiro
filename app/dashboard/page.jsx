@@ -5,6 +5,7 @@ import SeletorMes from "../../components/SeletorMes";
 import GraficoPizza from "../../components/GraficoPizza";
 import ResumoCategorias from "../../components/ResumoCategorias";
 import RankingGastos from "../../components/RankingGastos";
+import AnaliseInterativa from "../../components/AnaliseInterativa";
 import EditarGastoFixoModal from "../../components/EditarGastoFixoModal";
 import { useToast } from "../../components/Toast";
 import { supabaseConfigurado } from "../../lib/supabase";
@@ -132,6 +133,9 @@ export default function Dashboard() {
 
       {/* Gráfico de distribuição de gastos */}
       <GraficoPizza transacoes={transacoes} />
+
+      {/* Exploração interativa: clique para descer ao detalhe */}
+      <AnaliseInterativa transacoes={transacoes} />
 
       {/* Análises: resumo por categoria e ranking de gastos */}
       <ResumoCategorias transacoes={transacoes} />

@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X, Pencil, Trash2 } from "lucide-react";
 import SwipeCard from "../../components/SwipeCard";
 import EditarTransacaoModal from "../../components/EditarTransacaoModal";
 import { useCatalogo } from "../../hooks/useCatalogo";
@@ -80,7 +80,10 @@ export default function Historico() {
   }
 
   async function apagar(t) {
-    if (!window.confirm("Apagar esta transação?")) return;
+    const msg =
+      `Apagar "${t.descricao}" — ${formatBRL(Math.abs(t.valor))}?` +
+      "\n\nIsso não pode ser desfeito.";
+    if (!window.confirm(msg)) return;
     try {
       await deletarTransacao(t.id);
       toast("✓ Apagada");
@@ -255,7 +258,8 @@ export default function Historico() {
       <div className="space-y-2">
         {lista.map((t) => (
           <SwipeCard key={t.id} onEditar={() => setEditando(t)} onApagar={() => apagar(t)}>
-            <div className="p-3 flex items-center justify-between border border-neutral-200 rounded-xl">
+            <div className="p-3 border border-neutral-200 rounded-xl">
+              <div className="flex items-center justify-between">
               <div className="min-w-0">
                 <p className="font-medium truncate">
                   {t.descricao}
@@ -285,14 +289,35 @@ export default function Historico() {
                   </div>
                 )}
               </div>
-              <span
-                className={`font-semibold shrink-0 ${
-                  t.tipo === "despesa" ? "text-despesa" : "text-receita"
-                }`}
-              >
-                {t.tipo === "despesa" ? "-" : "+"}
-                {formatBRL(Math.abs(t.valor))}
-              </span>
+                <span
+                  className={`font-semibold shrink-0 ${
+                    t.tipo === "despesa" ? "text-despesa" : "text-receita"
+                  }`}
+                >
+                  {t.tipo === "despesa" ? "-" : "+"}
+                  {formatBRL(Math.abs(t.valor))}
+                </span>
+              </div>
+
+              {/* Botões visíveis. O arrastar-para-a-esquerda continua funcionando
+                  como atalho, mas ninguém precisa descobrir o gesto.
+                  stopPropagation evita que o toque no botão inicie o arrasto. */}
+              <div className="mt-2 flex justify-end gap-2">
+                <button
+                  onClick={() => setEditando(t)}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="flex items-center gap-1 text-xs border border-neutral-300 text-neutral-600 rounded-lg px-3 py-1.5 toque"
+                >
+                  <Pencil size={14} /> Editar
+                </button>
+                <button
+                  onClick={() => apagar(t)}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="flex items-center gap-1 text-xs border border-neutral-300 text-despesa rounded-lg px-3 py-1.5 toque"
+                >
+                  <Trash2 size={14} /> Excluir
+                </button>
+              </div>
             </div>
           </SwipeCard>
         ))}

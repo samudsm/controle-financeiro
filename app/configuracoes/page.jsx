@@ -114,7 +114,7 @@ export default function Configuracoes() {
                 <div className="flex items-center gap-2">
                   <span
                     className="w-3 h-3 rounded-full shrink-0"
-                    style={{ background: c.cor || corDaCategoria(c.nome, i) }}
+                    style={{ background: corDaCategoria(c.nome, i) }}
                   />
                   <span className="font-medium">{c.nome}</span>
                   <span className="text-xs text-neutral-400">

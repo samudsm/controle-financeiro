@@ -1,6 +1,8 @@
 // Service Worker — cache offline (estratégia network-first para navegação,
 // cache-first para assets estáticos).
-const CACHE = "financeiro-v1";
+// Suba este número a cada mudança grande: o "activate" apaga todo cache
+// com nome diferente deste, e é assim que a versão velha sai do ar.
+const CACHE = "financeiro-v2";
 const ESSENCIAIS = ["/dashboard", "/manifest.json", "/icon.svg"];
 
 self.addEventListener("install", (e) => {
