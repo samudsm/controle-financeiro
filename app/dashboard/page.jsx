@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { FastForward, Pencil, TrendingUp, TrendingDown, Wallet } from "lucide-react";
 import SeletorMes from "../../components/SeletorMes";
 import GraficoPizza from "../../components/GraficoPizza";
+import ResumoCategorias from "../../components/ResumoCategorias";
+import RankingGastos from "../../components/RankingGastos";
 import EditarGastoFixoModal from "../../components/EditarGastoFixoModal";
 import { useToast } from "../../components/Toast";
 import { supabaseConfigurado } from "../../lib/supabase";
@@ -125,6 +127,10 @@ export default function Dashboard() {
 
       {/* Gráfico de distribuição de gastos */}
       <GraficoPizza transacoes={transacoes} />
+
+      {/* Análises: resumo por categoria e ranking de gastos */}
+      <ResumoCategorias transacoes={transacoes} />
+      <RankingGastos transacoes={transacoes} />
 
       {/* Parcelas do mês (com antecipação) */}
       {parcelas.length > 0 && (
