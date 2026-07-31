@@ -7,7 +7,7 @@ import { useCatalogo } from "../../hooks/useCatalogo";
 import { useToast } from "../../components/Toast";
 import { supabaseConfigurado } from "../../lib/supabase";
 import { extrairTextoPDF, extrairTransacoes, chaveDuplicata } from "../../lib/pdf";
-import { listarTodasTransacoes, criarTransacoes } from "../../lib/db";
+import { listarTodasTransacoes, criarTransacoes, definirTagsDaTransacao } from "../../lib/db";
 import { dataBRparaISO, formatBRL, formatData } from "../../lib/format";
 import { pareceFatura } from "../../lib/categorias";
 
@@ -85,8 +85,11 @@ export default function UploadPage() {
         descricao: t.descricao,
         categoria: "",
         subcategoria: "",
-        tipo: t.valorBruto < 0 ? "saida" : "entrada",
+        tipo: t.valorBruto < 0 ? "despesa" : "receita",
         valor: t.valor,
+        estabelecimento: "",
+        forma_pagamento: "",
+        tags: [],
         notas: "",
         status: "pago",
         is_fixa: false,
@@ -101,20 +104,46 @@ export default function UploadPage() {
   }
 
   async function salvarTudo() {
+    // Categoria virou lista fechada e obrigatória — nada mais cai em "Outros".
+    const semCategoria = itens.filter((it) => !it.categoria).length;
+    if (semCategoria > 0) {
+      toast(`${semCategoria} lançamento(s) sem categoria. Escolha uma para cada.`, "erro");
+      return;
+    }
+    const invalida = itens.find(
+      (it) => it.subcategoria && !catalogo.subcategoriaValida(it.categoria, it.subcategoria)
+    );
+    if (invalida) {
+      toast(`"${invalida.subcategoria}" não pertence a ${invalida.categoria}.`, "erro");
+      return;
+    }
+
     setSalvando(true);
     try {
-      const lista = itens.map((it) => ({
-        data: dataBRparaISO(it.dataBR) || it.dataBR,
-        descricao: it.descricao,
-        categoria: it.categoria || "Outros",
-        subcategoria: it.subcategoria || null,
-        tipo: it.tipo,
-        valor: Number(it.valor) || 0,
-        notas: it.notas || null,
-        status: it.status || "pago",
-        is_fixa: !!it.is_fixa,
-      }));
-      await criarTransacoes(lista);
+      const lista = itens.map((it) => {
+        const { categoria_id, subcategoria_id } = catalogo.idsDe(it.categoria, it.subcategoria);
+        return {
+          data: dataBRparaISO(it.dataBR) || it.dataBR,
+          descricao: it.descricao,
+          categoria: it.categoria,
+          subcategoria: it.subcategoria || null,
+          categoria_id,
+          subcategoria_id,
+          tipo: it.tipo,
+          valor: Number(it.valor) || 0,
+          estabelecimento: it.estabelecimento || null,
+          forma_pagamento: it.forma_pagamento || null,
+          notas: it.notas || null,
+          status: it.status || "pago",
+          is_fixa: !!it.is_fixa,
+        };
+      });
+      const criadas = await criarTransacoes(lista);
+      // Grava as tags de cada lançamento recém-criado.
+      for (let i = 0; i < criadas.length; i++) {
+        const tags = itens[i]?.tags || [];
+        if (tags.length) await definirTagsDaTransacao(criadas[i].id, tags);
+      }
       toast(`✓ ${lista.length} transação(ões) salva(s)`);
       // Reset.
       setEtapa("upload");

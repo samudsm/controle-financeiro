@@ -13,8 +13,10 @@ import { TIPOS } from "../../lib/categorias";
 
 const FILTRO_VAZIO = {
   categoria: "",
+  subcategoria: "",
   tipo: "",
   status: "",
+  tag: "",
   de: "",
   ate: "",
   busca: "",
@@ -127,7 +129,7 @@ export default function Historico() {
               <select
                 className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-white"
                 value={filtros.categoria}
-                onChange={(e) => set("categoria", e.target.value)}
+                onChange={(e) => set2({ categoria: e.target.value, subcategoria: "" })}
               >
                 <option value="">Todas</option>
                 {catalogo.categorias.map((c) => (
@@ -147,6 +149,38 @@ export default function Historico() {
                 {TIPOS.map((t) => (
                   <option key={t.valor} value={t.valor}>
                     {t.rotulo}
+                  </option>
+                ))}
+              </select>
+            </Campo>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Campo rotulo="Subcategoria">
+              <select
+                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
+                value={filtros.subcategoria}
+                disabled={!filtros.categoria}
+                onChange={(e) => set("subcategoria", e.target.value)}
+              >
+                <option value="">{filtros.categoria ? "Todas" : "Escolha a categoria"}</option>
+                {catalogo.opcoesSubcategorias(filtros.categoria).map((s) => (
+                  <option key={s.valor} value={s.valor}>
+                    {s.rotulo}
+                  </option>
+                ))}
+              </select>
+            </Campo>
+            <Campo rotulo="Tag">
+              <select
+                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-white"
+                value={filtros.tag}
+                onChange={(e) => set("tag", e.target.value)}
+              >
+                <option value="">Todas</option>
+                {catalogo.tags.map((t) => (
+                  <option key={t.id} value={t.nome}>
+                    {t.nome}
                   </option>
                 ))}
               </select>
@@ -231,17 +265,32 @@ export default function Historico() {
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-neutral-500 truncate">
                   {formatData(t.data)} · {t.categoria}
+                  {t.subcategoria && ` › ${t.subcategoria}`}
+                  {t.estabelecimento && ` · ${t.estabelecimento}`}
+                  {t.forma_pagamento && ` · ${t.forma_pagamento}`}
                   {t.status === "pendente" && " · ⏳ pendente"}
                 </p>
+                {t.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {t.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] bg-marca/10 text-marca px-1.5 py-0.5 rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <span
                 className={`font-semibold shrink-0 ${
-                  t.tipo === "saida" ? "text-despesa" : "text-receita"
+                  t.tipo === "despesa" ? "text-despesa" : "text-receita"
                 }`}
               >
-                {t.tipo === "saida" ? "-" : "+"}
+                {t.tipo === "despesa" ? "-" : "+"}
                 {formatBRL(Math.abs(t.valor))}
               </span>
             </div>

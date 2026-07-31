@@ -1,16 +1,18 @@
 "use client";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { corDaCategoria } from "../lib/categorias";
+import { apenasDespesas } from "../lib/totais";
 import { formatBRL } from "../lib/format";
 
-// Gráfico de pizza: distribuição das SAÍDAS do mês por categoria.
+// Gráfico de pizza: distribuição das DESPESAS do mês por categoria.
+// Estornos e transferências ficam de fora (não são gasto).
 export default function GraficoPizza({ transacoes }) {
-  const saidas = transacoes.filter((t) => t.tipo === "saida");
+  const saidas = apenasDespesas(transacoes);
 
   // Agrupa por categoria e soma.
   const soma = {};
   for (const t of saidas) {
-    const cat = t.categoria || "Outros";
+    const cat = t.categoria || "(sem categoria)";
     soma[cat] = (soma[cat] || 0) + Math.abs(Number(t.valor) || 0);
   }
   const dados = Object.entries(soma)
@@ -26,7 +28,7 @@ export default function GraficoPizza({ transacoes }) {
   return (
     <section className="mt-6 bg-white rounded-xl border border-neutral-200 p-4">
       <h2 className="font-semibold mb-1">Distribuição de gastos</h2>
-      <p className="text-xs text-neutral-500 mb-2">Total de saídas: {formatBRL(total)}</p>
+      <p className="text-xs text-neutral-500 mb-2">Total de despesas: {formatBRL(total)}</p>
       <div className="w-full h-72">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import Modal from "./Modal";
-import Combobox from "./Combobox";
 import { formatBRL } from "../lib/format";
 import { useToast } from "./Toast";
 import { criarTransacoes } from "../lib/db";
@@ -32,18 +31,29 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
 
   async function salvar() {
     if (!bate) return;
+    const semCategoria = itens.filter((i) => !i.categoria).length;
+    if (semCategoria > 0) {
+      toast(`${semCategoria} item(ns) sem categoria. Escolha uma para cada.`, "erro");
+      return;
+    }
     setSalvando(true);
     try {
-      const lista = itens.map((i) => ({
-        data: fatura.data,
-        descricao: i.descricao || "(item da fatura)",
-        categoria: i.categoria || "Outros",
-        subcategoria: i.subcategoria || null,
-        tipo: "saida",
-        valor: Number(i.valor) || 0,
-        notas: `Da fatura: ${fatura.descricao}`,
-        status: "pago",
-      }));
+      const lista = itens.map((i) => {
+        const { categoria_id, subcategoria_id } = catalogo.idsDe(i.categoria, i.subcategoria);
+        return {
+          data: fatura.data,
+          descricao: i.descricao || "(item da fatura)",
+          categoria: i.categoria,
+          subcategoria: i.subcategoria || null,
+          categoria_id,
+          subcategoria_id,
+          tipo: "despesa",
+          valor: Number(i.valor) || 0,
+          forma_pagamento: "Crédito à vista",
+          notas: `Da fatura: ${fatura.descricao}`,
+          status: "pago",
+        };
+      });
       await criarTransacoes(lista);
       toast(`✓ Fatura decomposta: ${lista.length} itens criados`);
       onSalvo?.();
@@ -105,14 +115,22 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
               onChange={(e) => set(idx, "descricao", e.target.value)}
             />
             <div className="grid grid-cols-2 gap-2 mb-2">
-              <Combobox
-                valor={it.categoria}
-                onChange={(v) => set(idx, "categoria", v)}
-                opcoes={catalogo.opcoesCategorias()}
-                placeholder="Categoria"
-                rotuloNovo="Nova categoria"
-                onCriarNovo={(nome) => catalogo.criarCategoria(nome)}
-              />
+              <select
+                className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white"
+                value={it.categoria}
+                onChange={(e) => {
+                  // Trocar categoria zera a subcategoria (ela pertence a uma categoria só).
+                  set(idx, "categoria", e.target.value);
+                  set(idx, "subcategoria", "");
+                }}
+              >
+                <option value="">Categoria…</option>
+                {catalogo.opcoesCategorias().map((c) => (
+                  <option key={c.valor} value={c.valor}>
+                    {c.rotulo}
+                  </option>
+                ))}
+              </select>
               <input
                 type="number"
                 step="0.01"
@@ -122,6 +140,21 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
                 onChange={(e) => set(idx, "valor", e.target.value)}
               />
             </div>
+            <select
+              className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
+              value={it.subcategoria}
+              disabled={!it.categoria}
+              onChange={(e) => set(idx, "subcategoria", e.target.value)}
+            >
+              <option value="">
+                {it.categoria ? "Subcategoria (opcional)…" : "Escolha a categoria antes"}
+              </option>
+              {catalogo.opcoesSubcategorias(it.categoria).map((s) => (
+                <option key={s.valor} value={s.valor}>
+                  {s.rotulo}
+                </option>
+              ))}
+            </select>
           </div>
         ))}
       </div>

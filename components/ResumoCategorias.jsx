@@ -2,14 +2,15 @@
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { corDaCategoria } from "../lib/categorias";
+import { apenasDespesas } from "../lib/totais";
 import { formatBRL } from "../lib/format";
 
 export default function ResumoCategorias({ transacoes }) {
   const [aberta, setAberta] = useState({});
-  const saidas = transacoes.filter((t) => t.tipo === "saida");
+  const saidas = apenasDespesas(transacoes);
   const grupos = {};
   for (const t of saidas) {
-    const cat = t.categoria || "Outros";
+    const cat = t.categoria || "(sem categoria)";
     const val = Math.abs(Number(t.valor) || 0);
     if (!grupos[cat]) grupos[cat] = { total: 0, qtd: 0, subs: {} };
     grupos[cat].total += val;
@@ -60,7 +61,7 @@ export default function ResumoCategorias({ transacoes }) {
         })}
       </div>
       <div className="flex justify-between mt-3 pt-3 border-t border-neutral-200 font-semibold">
-        <span>Total de saídas</span>
+        <span>Total de despesas</span>
         <span className="text-despesa">{formatBRL(totalGeral)}</span>
       </div>
     </section>

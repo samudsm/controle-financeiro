@@ -3,30 +3,44 @@ import { useState } from "react";
 import Modal from "./Modal";
 import CamposTransacao from "./CamposTransacao";
 import { useToast } from "./Toast";
-import { atualizarTransacao, deletarTransacao } from "../lib/db";
+import { atualizarTransacao, deletarTransacao, definirTagsDaTransacao } from "../lib/db";
 
 export default function EditarTransacaoModal({ transacao, catalogo, onFechar, onSalvo }) {
   const toast = useToast();
-  const [t, setT] = useState({ ...transacao });
+  const [t, setT] = useState({ ...transacao, tags: transacao.tags || [] });
   const [salvando, setSalvando] = useState(false);
 
   const ehParcela = t.parcela_numero && t.parcela_total;
   const set = (campo, valor) => setT((prev) => ({ ...prev, [campo]: valor }));
 
   async function salvar() {
+    if (!t.categoria) {
+      toast("Escolha uma categoria.", "erro");
+      return;
+    }
+    if (t.subcategoria && !catalogo.subcategoriaValida(t.categoria, t.subcategoria)) {
+      toast(`"${t.subcategoria}" não pertence a ${t.categoria}.`, "erro");
+      return;
+    }
     setSalvando(true);
     try {
+      const { categoria_id, subcategoria_id } = catalogo.idsDe(t.categoria, t.subcategoria);
       await atualizarTransacao(t.id, {
         data: t.data,
         descricao: t.descricao,
         categoria: t.categoria,
         subcategoria: t.subcategoria || null,
+        categoria_id,
+        subcategoria_id,
         tipo: t.tipo,
         valor: Number(t.valor) || 0,
+        estabelecimento: t.estabelecimento || null,
+        forma_pagamento: t.forma_pagamento || null,
         notas: t.notas || null,
         status: t.status || "pago",
         is_fixa: !!t.is_fixa,
       });
+      await definirTagsDaTransacao(t.id, t.tags || []);
       toast("✓ Transação atualizada");
       onSalvo?.();
       onFechar();

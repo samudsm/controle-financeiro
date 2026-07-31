@@ -10,6 +10,7 @@ import { useToast } from "../../components/Toast";
 import { supabaseConfigurado } from "../../lib/supabase";
 import { mesAtual, primeiroDiaDoMes, rotuloMes } from "../../lib/dates";
 import { formatBRL } from "../../lib/format";
+import { calcularTotais } from "../../lib/totais";
 import {
   listarTransacoesDoMes,
   listarPendenciasDoMes,
@@ -50,12 +51,11 @@ export default function Dashboard() {
   }, [carregar]);
 
   // ----- KPIs -----
-  const entradasReal = transacoes
-    .filter((t) => t.tipo === "entrada" || t.tipo === "reembolso")
-    .reduce((s, t) => s + Math.abs(Number(t.valor) || 0), 0);
-  const saidasReal = transacoes
-    .filter((t) => t.tipo === "saida")
-    .reduce((s, t) => s + Math.abs(Number(t.valor) || 0), 0);
+  // calcularTotais aplica as regras do modelo: estorno abate despesa,
+  // transferência fica fora de tudo.
+  const totais = calcularTotais(transacoes);
+  const entradasReal = totais.receitas;
+  const saidasReal = totais.despesas; // já com os estornos descontados
   const previstoReceber = pendencias
     .filter((p) => p.tipo === "a_receber" && p.status === "pendente")
     .reduce((s, p) => s + Math.abs(Number(p.valor) || 0), 0);
@@ -113,6 +113,11 @@ export default function Dashboard() {
           real={saidasReal}
           previsto={previstoPagar}
           rotuloPrevisto="A Pagar"
+          extra={
+            totais.estornos > 0
+              ? `Já descontado ${formatBRL(totais.estornos)} de estornos (de ${formatBRL(totais.despesasBrutas)} brutos)`
+              : null
+          }
         />
         <div className="bg-marca text-white rounded-xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -217,7 +222,7 @@ export default function Dashboard() {
   );
 }
 
-function Kpi({ titulo, valor, cor, Icone, real, previsto, rotuloPrevisto }) {
+function Kpi({ titulo, valor, cor, Icone, real, previsto, rotuloPrevisto, extra }) {
   return (
     <div className="bg-white rounded-xl border border-neutral-200 p-4">
       <div className="flex items-center justify-between">
@@ -230,6 +235,7 @@ function Kpi({ titulo, valor, cor, Icone, real, previsto, rotuloPrevisto }) {
       <div className="mt-2 text-xs text-neutral-500 space-y-0.5">
         <p>├─ Real: {formatBRL(real)}</p>
         <p>└─ Previsto ({rotuloPrevisto}): {formatBRL(previsto)}</p>
+        {extra && <p className="text-neutral-400 pt-0.5">{extra}</p>}
       </div>
     </div>
   );

@@ -1,15 +1,18 @@
 "use client";
 import { Trophy, Store } from "lucide-react";
 import { formatBRL, formatData } from "../lib/format";
+import { apenasDespesas } from "../lib/totais";
 
 export default function RankingGastos({ transacoes }) {
-  const saidas = transacoes.filter((t) => t.tipo === "saida");
+  const saidas = apenasDespesas(transacoes);
   if (saidas.length === 0) return null;
   const topTransacoes = [...saidas].sort((a, b) => Math.abs(b.valor) - Math.abs(a.valor)).slice(0, 5);
+  // Agrupa pelo estabelecimento quando ele estiver preenchido; senão, pela descrição.
   const porLocal = {};
   for (const t of saidas) {
-    const chave = String(t.descricao || "").trim().toUpperCase();
-    if (!porLocal[chave]) porLocal[chave] = { nome: t.descricao, total: 0, qtd: 0 };
+    const nome = t.estabelecimento || t.descricao;
+    const chave = String(nome || "").trim().toUpperCase();
+    if (!porLocal[chave]) porLocal[chave] = { nome, total: 0, qtd: 0 };
     porLocal[chave].total += Math.abs(Number(t.valor) || 0);
     porLocal[chave].qtd += 1;
   }
