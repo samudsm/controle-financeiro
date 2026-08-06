@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Plus, Tag as IconeTag } from "lucide-react";
 
-// Seleção de várias tags. Aceita tags existentes (lista) ou texto livre.
+// Seleção de várias tags. Aceita tags da lista ou texto livre.
 // valor: array de nomes. onChange: recebe o novo array.
 export default function SeletorTags({ valor = [], onChange, opcoes = [], onCriarNova }) {
   const [texto, setTexto] = useState("");
@@ -17,18 +17,36 @@ export default function SeletorTags({ valor = [], onChange, opcoes = [], onCriar
     return () => document.removeEventListener("mousedown", fora);
   }, []);
 
+  // O modal tem área rolável, então a lista pode abrir fora do campo de visão.
+  // Ao abrir, puxa o campo para dentro da tela.
+  useEffect(() => {
+    if (aberto && ref.current) {
+      ref.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [aberto]);
+
   const filtro = texto.toLowerCase().trim();
+
+  // Comparações sempre sem diferenciar maiúscula/minúscula, senão "destine"
+  // vira uma tag nova ao lado da "Destine" que já existe.
+  const jaEscolhida = (nome) => valor.some((v) => v.toLowerCase() === nome.toLowerCase());
+
   const disponiveis = opcoes
-    .filter((o) => !valor.includes(o.rotulo))
+    .filter((o) => !jaEscolhida(o.rotulo))
     .filter((o) => o.rotulo.toLowerCase().includes(filtro))
     .slice(0, 8);
 
-  const jaExiste = opcoes.some((o) => o.rotulo.toLowerCase() === filtro);
-  const podeCriar = filtro && !jaExiste && !valor.some((v) => v.toLowerCase() === filtro);
+  const correspondeExata = opcoes.find((o) => o.rotulo.toLowerCase() === filtro);
+  const podeCriar = Boolean(filtro) && !correspondeExata && !jaEscolhida(filtro);
 
   function adicionar(nome) {
-    if (!nome || valor.includes(nome)) return;
-    onChange([...valor, nome]);
+    const limpo = String(nome || "").trim();
+    if (!limpo || jaEscolhida(limpo)) {
+      setTexto("");
+      setAberto(false);
+      return;
+    }
+    onChange([...valor, limpo]);
     setTexto("");
     setAberto(false);
   }
@@ -39,8 +57,21 @@ export default function SeletorTags({ valor = [], onChange, opcoes = [], onCriar
 
   async function criar() {
     const nova = texto.trim();
+    if (!nova) return;
     if (onCriarNova) await onCriarNova(nova);
     adicionar(nova);
+  }
+
+  // Enter: prioriza o que já existe. Se o texto casa exatamente com uma tag,
+  // usa ela; se sobrou só uma sugestão na lista, usa ela; só então cria nova.
+  // (Antes, digitar "Desti" e apertar Enter criava a tag "Desti" ao lado
+  // da "Destine" que já existia.)
+  function aoTeclar(e) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    if (correspondeExata) return adicionar(correspondeExata.rotulo);
+    if (disponiveis.length === 1) return adicionar(disponiveis[0].rotulo);
+    if (podeCriar) return criar();
   }
 
   return (
@@ -76,22 +107,23 @@ export default function SeletorTags({ valor = [], onChange, opcoes = [], onCriar
           setAberto(true);
         }}
         onFocus={() => setAberto(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            if (jaExiste) adicionar(opcoes.find((o) => o.rotulo.toLowerCase() === filtro).rotulo);
-            else if (podeCriar) criar();
-          }
-        }}
+        onKeyDown={aoTeclar}
       />
 
       {aberto && (disponiveis.length > 0 || podeCriar) && (
-        <div className="absolute z-30 mt-1 w-full bg-white border border-neutral-200 rounded-lg shadow-lg max-h-52 overflow-auto">
+        // onMouseDown com preventDefault: segura o foco no campo para que o
+        // clique chegue até o onClick. Sem isso o mousedown tira o foco, a
+        // lista fecha e o clique se perde — era por isso que escolher uma tag
+        // existente não funcionava, enquanto criar uma nova (via Enter) sim.
+        <div
+          className="absolute z-30 mt-1 w-full bg-white border border-neutral-200 rounded-lg shadow-lg max-h-52 overflow-auto"
+          onMouseDown={(e) => e.preventDefault()}
+        >
           {disponiveis.map((o) => (
             <button
               key={o.valor}
               type="button"
-              className="w-full text-left px-3 py-2 hover:bg-neutral-100 text-sm"
+              className="w-full text-left px-3 py-2 hover:bg-neutral-100 active:bg-neutral-200 text-sm"
               onClick={() => adicionar(o.rotulo)}
             >
               {o.rotulo}
@@ -100,10 +132,10 @@ export default function SeletorTags({ valor = [], onChange, opcoes = [], onCriar
           {podeCriar && (
             <button
               type="button"
-              className="w-full text-left px-3 py-2 text-marca hover:bg-blue-50 flex items-center gap-2 border-t border-neutral-100 text-sm"
+              className="w-full text-left px-3 py-2 text-marca hover:bg-blue-50 active:bg-blue-100 flex items-center gap-2 border-t border-neutral-100 text-sm"
               onClick={criar}
             >
-              <Plus size={15} /> Criar tag: "{texto.trim()}"
+              <Plus size={15} /> Criar tag: {texto.trim()}
             </button>
           )}
         </div>
