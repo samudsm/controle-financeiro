@@ -2,28 +2,45 @@
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import Modal from "./Modal";
+import CamposTransacao from "./CamposTransacao";
 import { formatBRL } from "../lib/format";
 import { useToast } from "./Toast";
-import { criarTransacoes } from "../lib/db";
+import { criarTransacoes, definirTagsDaTransacao } from "../lib/db";
+
+// Um item novo já nasce com a descrição da fatura — dá pra editar,
+// mas quem quiser manter o nome original não precisa digitar nada.
+function itemVazio(descricaoFatura) {
+  return {
+    descricao: descricaoFatura || "",
+    categoria: "",
+    subcategoria: "",
+    tipo: "despesa",
+    valor: "",
+    estabelecimento: "",
+    forma_pagamento: "Crédito à vista",
+    tags: [],
+    notas: "",
+    status: "pago",
+    is_fixa: false,
+  };
+}
 
 // Decompõe uma fatura (valor total) em vários itens = várias transações.
 export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) {
   const toast = useToast();
   const total = Math.abs(Number(fatura.valor) || 0);
-  const [itens, setItens] = useState([
-    { descricao: "", categoria: "", subcategoria: "", valor: "" },
-    { descricao: "", categoria: "", subcategoria: "", valor: "" },
-  ]);
+  const [itens, setItens] = useState([itemVazio(fatura.descricao), itemVazio(fatura.descricao)]);
   const [salvando, setSalvando] = useState(false);
 
   const somaDistribuida = itens.reduce((s, i) => s + (Number(i.valor) || 0), 0);
   const bate = Math.abs(somaDistribuida - total) < 0.005;
+  const falta = total - somaDistribuida;
 
   function set(idx, campo, valor) {
     setItens((arr) => arr.map((it, i) => (i === idx ? { ...it, [campo]: valor } : it)));
   }
   function adicionar() {
-    setItens((arr) => [...arr, { descricao: "", categoria: "", subcategoria: "", valor: "" }]);
+    setItens((arr) => [...arr, itemVazio(fatura.descricao)]);
   }
   function remover(idx) {
     setItens((arr) => arr.filter((_, i) => i !== idx));
@@ -31,11 +48,20 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
 
   async function salvar() {
     if (!bate) return;
+
     const semCategoria = itens.filter((i) => !i.categoria).length;
     if (semCategoria > 0) {
       toast(`${semCategoria} item(ns) sem categoria. Escolha uma para cada.`, "erro");
       return;
     }
+    const invalida = itens.find(
+      (i) => i.subcategoria && !catalogo.subcategoriaValida(i.categoria, i.subcategoria)
+    );
+    if (invalida) {
+      toast(`"${invalida.subcategoria}" não pertence a ${invalida.categoria}.`, "erro");
+      return;
+    }
+
     setSalvando(true);
     try {
       const lista = itens.map((i) => {
@@ -47,14 +73,22 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
           subcategoria: i.subcategoria || null,
           categoria_id,
           subcategoria_id,
-          tipo: "despesa",
+          tipo: i.tipo || "despesa",
           valor: Number(i.valor) || 0,
-          forma_pagamento: "Crédito à vista",
-          notas: `Da fatura: ${fatura.descricao}`,
-          status: "pago",
+          estabelecimento: i.estabelecimento || null,
+          forma_pagamento: i.forma_pagamento || null,
+          notas: i.notas || `Da fatura: ${fatura.descricao}`,
+          status: i.status || "pago",
+          is_fixa: !!i.is_fixa,
         };
       });
-      await criarTransacoes(lista);
+
+      const criadas = await criarTransacoes(lista);
+      for (let i = 0; i < criadas.length; i++) {
+        const tags = itens[i]?.tags || [];
+        if (tags.length) await definirTagsDaTransacao(criadas[i].id, tags);
+      }
+
       toast(`✓ Fatura decomposta: ${lista.length} itens criados`);
       onSalvo?.();
       onFechar();
@@ -83,17 +117,21 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
             onClick={salvar}
             className="bg-marca text-white px-4 py-2 rounded-lg toque disabled:opacity-40"
           >
-            Salvar Tudo
+            {salvando ? "Salvando…" : "Salvar Tudo"}
           </button>
         </div>
       }
     >
       <p className="text-sm text-neutral-500 mb-3">
-        Total original: <strong>{formatBRL(total)}</strong>. Cada item vira uma transação separada.
+        Total original: <strong>{formatBRL(total)}</strong>. Cada item vira um lançamento
+        separado, com todos os campos normais.
       </p>
+
       {!bate && (
         <div className="mb-3 rounded-lg bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm px-3 py-2">
-          A soma dos itens precisa ser igual ao total da fatura.
+          {falta > 0
+            ? `Faltam ${formatBRL(falta)} para fechar o total da fatura.`
+            : `Passou ${formatBRL(Math.abs(falta))} do total da fatura.`}
         </div>
       )}
 
@@ -103,58 +141,23 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-neutral-500">ITEM {idx + 1}</span>
               {itens.length > 1 && (
-                <button onClick={() => remover(idx)} className="text-despesa p-1">
+                <button
+                  onClick={() => remover(idx)}
+                  className="text-despesa p-1"
+                  aria-label={`Remover item ${idx + 1}`}
+                >
                   <Trash2 size={16} />
                 </button>
               )}
             </div>
-            <input
-              className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque mb-2"
-              placeholder="Descrição"
-              value={it.descricao}
-              onChange={(e) => set(idx, "descricao", e.target.value)}
+
+            {/* Mesmos campos de qualquer outro lançamento */}
+            <CamposTransacao
+              t={it}
+              set={(campo, valor) => set(idx, campo, valor)}
+              catalogo={catalogo}
+              autoSugerir={false}
             />
-            <div className="grid grid-cols-2 gap-2 mb-2">
-              <select
-                className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white"
-                value={it.categoria}
-                onChange={(e) => {
-                  // Trocar categoria zera a subcategoria (ela pertence a uma categoria só).
-                  set(idx, "categoria", e.target.value);
-                  set(idx, "subcategoria", "");
-                }}
-              >
-                <option value="">Categoria…</option>
-                {catalogo.opcoesCategorias().map((c) => (
-                  <option key={c.valor} value={c.valor}>
-                    {c.rotulo}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                step="0.01"
-                className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque"
-                placeholder="Valor R$"
-                value={it.valor}
-                onChange={(e) => set(idx, "valor", e.target.value)}
-              />
-            </div>
-            <select
-              className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
-              value={it.subcategoria}
-              disabled={!it.categoria}
-              onChange={(e) => set(idx, "subcategoria", e.target.value)}
-            >
-              <option value="">
-                {it.categoria ? "Subcategoria (opcional)…" : "Escolha a categoria antes"}
-              </option>
-              {catalogo.opcoesSubcategorias(it.categoria).map((s) => (
-                <option key={s.valor} value={s.valor}>
-                  {s.rotulo}
-                </option>
-              ))}
-            </select>
           </div>
         ))}
       </div>

@@ -1,13 +1,23 @@
 "use client";
 import { useMemo, useRef, useState } from "react";
-import { UploadCloud, FileText, Split, Loader2 } from "lucide-react";
+import { UploadCloud, FileText, Split, Loader2, EyeOff, X } from "lucide-react";
 import CamposTransacao from "../../components/CamposTransacao";
 import DecomporFatura from "../../components/DecomporFatura";
 import { useCatalogo } from "../../hooks/useCatalogo";
 import { useToast } from "../../components/Toast";
 import { supabaseConfigurado } from "../../lib/supabase";
 import { extrairTextoPDF, extrairTransacoes, chaveDuplicata } from "../../lib/pdf";
-import { listarTodasTransacoes, criarTransacoes, definirTagsDaTransacao } from "../../lib/db";
+import {
+  listarTodasTransacoes,
+  criarTransacoes,
+  definirTagsDaTransacao,
+  listarIgnorados,
+  ignorarLancamento,
+  ignorarDescricao,
+  conjuntosDeIgnorados,
+  chaveIgnorarLancamento,
+  chaveIgnorarDescricao,
+} from "../../lib/db";
 import { dataBRparaISO, formatBRL, formatData } from "../../lib/format";
 import { pareceFatura } from "../../lib/categorias";
 
@@ -24,6 +34,7 @@ export default function UploadPage() {
   const [itens, setItens] = useState([]); // itens em preenchimento
   const [decompor, setDecompor] = useState(null);
   const [salvando, setSalvando] = useState(false);
+  const [menuIgnorar, setMenuIgnorar] = useState(null); // índice da linha com o menu aberto
 
   async function processarArquivo(file) {
     if (!file || file.type !== "application/pdf") {
@@ -34,22 +45,31 @@ export default function UploadPage() {
     try {
       const linhas = await extrairTextoPDF(file);
       const trans = extrairTransacoes(linhas);
-      // Detecção de duplicatas.
-      const existentes = await listarTodasTransacoes();
+
+      const [existentes, regras] = await Promise.all([listarTodasTransacoes(), listarIgnorados()]);
+
+      // Detecção de duplicatas (já está no banco).
       const chaves = new Set(
         existentes.map((e) =>
           chaveDuplicata({ data: formatData(e.data), descricao: e.descricao, valor: e.valor })
         )
       );
+
+      // Regras de "não mostrar mais" salvas por você.
+      const { lancamentos, descricoes } = conjuntosDeIgnorados(regras);
+
       const comFlag = trans.map((t) => ({
         ...t,
         nova: !chaves.has(chaveDuplicata(t)),
+        ignorada:
+          lancamentos.has(chaveIgnorarLancamento(t)) ||
+          descricoes.has(chaveIgnorarDescricao(t.descricao)),
       }));
       setExtraidas(comFlag);
-      // Pré-seleciona as novas.
+      // Pré-seleciona as novas que não estão ignoradas.
       const sel = {};
       comFlag.forEach((t, i) => {
-        if (t.nova) sel[i] = true;
+        if (t.nova && !t.ignorada) sel[i] = true;
       });
       setSelecionadas(sel);
       if (comFlag.length === 0) toast("Nenhuma transação reconhecida no PDF.", "erro");
@@ -67,9 +87,46 @@ export default function UploadPage() {
   }
 
   const visiveis = useMemo(
-    () => extraidas.map((t, i) => ({ ...t, i })).filter((t) => (apenasNovas ? t.nova : true)),
+    () =>
+      extraidas
+        .map((t, i) => ({ ...t, i }))
+        .filter((t) => !t.ignorada && (apenasNovas ? t.nova : true)),
     [extraidas, apenasNovas]
   );
+
+  const qtdIgnoradas = extraidas.filter((t) => t.ignorada).length;
+
+  // Marca como ignorado e salva a regra no banco, para valer nas próximas
+  // importações. Não removemos do array: isso mudaria os índices e bagunçaria
+  // as seleções já feitas — a linha só deixa de ser exibida.
+  async function ignorar(t, criterio) {
+    try {
+      if (criterio === "descricao") await ignorarDescricao(t.descricao);
+      else await ignorarLancamento(t);
+
+      const alvo =
+        criterio === "descricao"
+          ? (x) => chaveIgnorarDescricao(x.descricao) === chaveIgnorarDescricao(t.descricao)
+          : (x) => chaveIgnorarLancamento(x) === chaveIgnorarLancamento(t);
+
+      setExtraidas((arr) => arr.map((x) => (alvo(x) ? { ...x, ignorada: true } : x)));
+      setSelecionadas((sel) => {
+        const copia = { ...sel };
+        extraidas.forEach((x, i) => {
+          if (alvo(x)) delete copia[i];
+        });
+        return copia;
+      });
+      setMenuIgnorar(null);
+      toast(
+        criterio === "descricao"
+          ? "✓ Essa descrição não aparecerá mais"
+          : "✓ Esse lançamento não aparecerá mais"
+      );
+    } catch (e) {
+      toast("Erro: " + e.message, "erro");
+    }
+  }
 
   function processarSelecionadas() {
     const escolhidas = extraidas
@@ -274,34 +331,83 @@ export default function UploadPage() {
             </label>
           </div>
 
+          {qtdIgnoradas > 0 && (
+            <p className="text-xs text-neutral-500 mb-2 flex items-center gap-1">
+              <EyeOff size={13} />
+              {qtdIgnoradas} oculta(s) pelas suas regras de &quot;não mostrar mais&quot;. Dá para
+              desfazer em Configurações.
+            </p>
+          )}
+
           <div className="space-y-2">
             {visiveis.map((t) => (
-              <label
-                key={t.i}
-                className="flex items-center gap-3 bg-white rounded-xl border border-neutral-200 p-3"
-              >
-                <input
-                  type="checkbox"
-                  checked={!!selecionadas[t.i]}
-                  onChange={(e) =>
-                    setSelecionadas((s) => ({ ...s, [t.i]: e.target.checked }))
-                  }
-                />
-                <FileText size={18} className="text-neutral-400 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="truncate font-medium">{t.descricao}</p>
-                  <p className="text-xs text-neutral-500">
-                    {t.data} · {formatBRL(t.valorBruto)}
-                  </p>
+              <div key={t.i} className="bg-white rounded-xl border border-neutral-200">
+                <div className="flex items-center gap-3 p-3">
+                  {/* O label cobre só o checkbox e o texto — o botão de ignorar
+                      fica fora, senão clicar nele marcaria a caixinha. */}
+                  <label className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!selecionadas[t.i]}
+                      onChange={(e) =>
+                        setSelecionadas((s) => ({ ...s, [t.i]: e.target.checked }))
+                      }
+                    />
+                    <FileText size={18} className="text-neutral-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate font-medium">{t.descricao}</p>
+                      <p className="text-xs text-neutral-500">
+                        {t.data} · {formatBRL(t.valorBruto)}
+                      </p>
+                    </div>
+                  </label>
+
+                  <span
+                    className={`text-xs shrink-0 ${
+                      t.nova ? "text-receita" : "text-neutral-400"
+                    }`}
+                  >
+                    {t.nova ? "○ Nova" : "✓ Já existe"}
+                  </span>
+
+                  <button
+                    onClick={() => setMenuIgnorar(menuIgnorar === t.i ? null : t.i)}
+                    className="text-neutral-400 hover:text-despesa p-1 shrink-0"
+                    aria-label={`Não mostrar mais ${t.descricao}`}
+                    title="Não mostrar mais"
+                  >
+                    {menuIgnorar === t.i ? <X size={17} /> : <EyeOff size={17} />}
+                  </button>
                 </div>
-                <span
-                  className={`text-xs shrink-0 ${
-                    t.nova ? "text-receita" : "text-neutral-400"
-                  }`}
-                >
-                  {t.nova ? "○ Nova" : "✓ Já existe"}
-                </span>
-              </label>
+
+                {menuIgnorar === t.i && (
+                  <div className="border-t border-neutral-100 p-3 bg-neutral-50 rounded-b-xl">
+                    <p className="text-xs text-neutral-500 mb-2">
+                      Não mostrar mais nas próximas importações:
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => ignorar(t, "lancamento")}
+                        className="flex-1 text-sm border border-neutral-300 bg-white rounded-lg px-3 py-2 toque text-left"
+                      >
+                        <strong className="block">Só este</strong>
+                        <span className="text-xs text-neutral-500">
+                          Este lançamento de {t.data}
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => ignorar(t, "descricao")}
+                        className="flex-1 text-sm border border-neutral-300 bg-white rounded-lg px-3 py-2 toque text-left"
+                      >
+                        <strong className="block">Sempre que aparecer</strong>
+                        <span className="text-xs text-neutral-500 block truncate">
+                          Qualquer &quot;{t.descricao}&quot;
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
 
