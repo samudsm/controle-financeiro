@@ -7,10 +7,13 @@ import { formatBRL } from "../lib/format";
 import { useToast } from "./Toast";
 import { criarTransacoes, definirTagsDaTransacao } from "../lib/db";
 
-// Um item novo já nasce com a descrição da fatura — dá pra editar,
-// mas quem quiser manter o nome original não precisa digitar nada.
-function itemVazio(descricaoFatura) {
+// Um item novo já nasce com a data e a descrição da fatura — dá pra editar,
+// mas quem quiser manter o original não precisa digitar nada.
+// A data é editável por item porque a fatura costuma juntar compras de
+// dias diferentes, muitas vezes do mês anterior.
+function itemVazio(descricaoFatura, dataFatura) {
   return {
+    data: dataFatura || "",
     descricao: descricaoFatura || "",
     categoria: "",
     subcategoria: "",
@@ -29,7 +32,10 @@ function itemVazio(descricaoFatura) {
 export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) {
   const toast = useToast();
   const total = Math.abs(Number(fatura.valor) || 0);
-  const [itens, setItens] = useState([itemVazio(fatura.descricao), itemVazio(fatura.descricao)]);
+  const [itens, setItens] = useState([
+    itemVazio(fatura.descricao, fatura.data),
+    itemVazio(fatura.descricao, fatura.data),
+  ]);
   const [salvando, setSalvando] = useState(false);
 
   const somaDistribuida = itens.reduce((s, i) => s + (Number(i.valor) || 0), 0);
@@ -40,7 +46,10 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
     setItens((arr) => arr.map((it, i) => (i === idx ? { ...it, [campo]: valor } : it)));
   }
   function adicionar() {
-    setItens((arr) => [...arr, itemVazio(fatura.descricao)]);
+    // O item novo herda a data do último preenchido: compras da mesma
+    // fatura tendem a ser de dias próximos.
+    const ultima = itens[itens.length - 1]?.data || fatura.data;
+    setItens((arr) => [...arr, itemVazio(fatura.descricao, ultima)]);
   }
   function remover(idx) {
     setItens((arr) => arr.filter((_, i) => i !== idx));
@@ -67,7 +76,7 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
       const lista = itens.map((i) => {
         const { categoria_id, subcategoria_id } = catalogo.idsDe(i.categoria, i.subcategoria);
         return {
-          data: fatura.data,
+          data: i.data || fatura.data,
           descricao: i.descricao || "(item da fatura)",
           categoria: i.categoria,
           subcategoria: i.subcategoria || null,
@@ -127,6 +136,11 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
         separado, com todos os campos normais.
       </p>
 
+      <div className="mb-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs px-3 py-2">
+        <strong>Compra de outro mês?</strong> Mude a data do item. O lançamento passa a
+        contar no painel daquele mês — nos totais, no gráfico e nas análises.
+      </div>
+
       {!bate && (
         <div className="mb-3 rounded-lg bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm px-3 py-2">
           {falta > 0
@@ -150,6 +164,18 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
                 </button>
               )}
             </div>
+
+            {/* Data por item: a fatura junta compras de dias diferentes,
+                muitas vezes do mês anterior. */}
+            <label className="block mb-3">
+              <span className="block text-xs font-medium text-neutral-500 mb-1">Data</span>
+              <input
+                type="date"
+                className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque"
+                value={(it.data || "").slice(0, 10)}
+                onChange={(e) => set(idx, "data", e.target.value)}
+              />
+            </label>
 
             {/* Mesmos campos de qualquer outro lançamento */}
             <CamposTransacao
