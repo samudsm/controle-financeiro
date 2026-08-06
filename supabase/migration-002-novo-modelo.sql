@@ -1,4 +1,15 @@
 -- =====================================================================
+-- ####################################################################
+-- ##  JA FOI APLICADO EM 30/07/2026. NAO RODE DE NOVO.               ##
+-- ##                                                                 ##
+-- ##  Rodar outra vez da este erro, de proposito:                    ##
+-- ##    violates foreign key constraint fk_transactions_subcategoria ##
+-- ##                                                                 ##
+-- ##  E a trava de integridade barrando o "delete from subcategorias"##
+-- ##  da secao 4. Nada e perdido quando isso acontece, mas o arquivo  ##
+-- ##  certo para novidades e o migration-003 em diante.               ##
+-- ####################################################################
+-- =====================================================================
 -- MIGRATION 002 — Novo modelo de categorias
 -- Rode este arquivo INTEIRO no SQL Editor do Supabase, uma vez só.
 --
