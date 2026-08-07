@@ -2,8 +2,8 @@
 // cache-first para assets estáticos).
 // Suba este número a cada mudança grande: o "activate" apaga todo cache
 // com nome diferente deste, e é assim que a versão velha sai do ar.
-const CACHE = "financeiro-v2";
-const ESSENCIAIS = ["/dashboard", "/manifest.json", "/icon.svg"];
+const CACHE = "painel-v3";
+const ESSENCIAIS = ["/", "/manifest.json", "/icon.svg"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ESSENCIAIS)).catch(() => {}));
@@ -36,7 +36,7 @@ self.addEventListener("fetch", (e) => {
           caches.open(CACHE).then((c) => c.put(req, copia));
           return resp;
         })
-        .catch(() => caches.match(req).then((r) => r || caches.match("/dashboard")))
+        .catch(() => caches.match(req).then((r) => r || caches.match("/")))
     );
     return;
   }

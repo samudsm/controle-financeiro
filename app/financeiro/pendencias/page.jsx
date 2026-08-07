@@ -1,18 +1,18 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { Plus, Check, Clock, AlertTriangle, Pencil, Trash2 } from "lucide-react";
-import SeletorMes from "../../components/SeletorMes";
-import Modal from "../../components/Modal";
-import { useToast } from "../../components/Toast";
-import { supabaseConfigurado } from "../../lib/supabase";
-import { mesAtual, rotuloMes } from "../../lib/dates";
-import { formatBRL } from "../../lib/format";
+import SeletorMes from "../../../components/SeletorMes";
+import Modal from "../../../components/Modal";
+import { useToast } from "../../../components/Toast";
+import { supabaseConfigurado } from "../../../lib/supabase";
+import { mesAtual, rotuloMes } from "../../../lib/dates";
+import { formatBRL } from "../../../lib/format";
 import {
   listarPendenciasDoMes,
   atualizarPendencia,
   criarPendencia,
   deletarPendencia,
-} from "../../lib/db";
+} from "../../../lib/db";
 
 export default function Pendencias() {
   const toast = useToast();

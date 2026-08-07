@@ -1,12 +1,12 @@
 "use client";
 import { useMemo, useRef, useState } from "react";
 import { UploadCloud, FileText, Split, Loader2, EyeOff, X } from "lucide-react";
-import CamposTransacao from "../../components/CamposTransacao";
-import DecomporFatura from "../../components/DecomporFatura";
-import { useCatalogo } from "../../hooks/useCatalogo";
-import { useToast } from "../../components/Toast";
-import { supabaseConfigurado } from "../../lib/supabase";
-import { extrairTextoPDF, extrairTransacoes, chaveDuplicata } from "../../lib/pdf";
+import CamposTransacao from "../../../components/CamposTransacao";
+import DecomporFatura from "../../../components/DecomporFatura";
+import { useCatalogo } from "../../../hooks/useCatalogo";
+import { useToast } from "../../../components/Toast";
+import { supabaseConfigurado } from "../../../lib/supabase";
+import { extrairTextoPDF, extrairTransacoes, chaveDuplicata } from "../../../lib/pdf";
 import {
   listarTodasTransacoes,
   criarTransacoes,
@@ -17,9 +17,9 @@ import {
   conjuntosDeIgnorados,
   chaveIgnorarLancamento,
   chaveIgnorarDescricao,
-} from "../../lib/db";
-import { dataBRparaISO, formatBRL, formatData } from "../../lib/format";
-import { pareceFatura } from "../../lib/categorias";
+} from "../../../lib/db";
+import { dataBRparaISO, formatBRL, formatData } from "../../../lib/format";
+import { pareceFatura } from "../../../lib/categorias";
 
 export default function UploadPage() {
   const toast = useToast();

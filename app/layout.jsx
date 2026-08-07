@@ -4,10 +4,10 @@ import BottomNav from "../components/BottomNav";
 import RegistrarSW from "../components/RegistrarSW";
 
 export const metadata = {
-  title: "Controle Financeiro",
-  description: "Controle de entradas, saídas, pendências e parcelas.",
+  title: "Meu Painel",
+  description: "App pessoal com módulos: financeiro, academia e o que vier.",
   manifest: "/manifest.json",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "Financeiro" },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Painel" },
 };
 
 export const viewport = {

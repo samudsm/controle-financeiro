@@ -1,22 +1,22 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { FastForward, Pencil, TrendingUp, TrendingDown, Wallet } from "lucide-react";
-import SeletorMes from "../../components/SeletorMes";
-import GraficoPizza from "../../components/GraficoPizza";
-import ResumoCategorias from "../../components/ResumoCategorias";
-import RankingGastos from "../../components/RankingGastos";
-import AnaliseInterativa from "../../components/AnaliseInterativa";
-import EditarGastoFixoModal from "../../components/EditarGastoFixoModal";
-import { useToast } from "../../components/Toast";
-import { supabaseConfigurado } from "../../lib/supabase";
-import { mesAtual, primeiroDiaDoMes, rotuloMes } from "../../lib/dates";
-import { formatBRL } from "../../lib/format";
-import { calcularTotais } from "../../lib/totais";
+import SeletorMes from "../../../components/SeletorMes";
+import GraficoPizza from "../../../components/GraficoPizza";
+import ResumoCategorias from "../../../components/ResumoCategorias";
+import RankingGastos from "../../../components/RankingGastos";
+import AnaliseInterativa from "../../../components/AnaliseInterativa";
+import EditarGastoFixoModal from "../../../components/EditarGastoFixoModal";
+import { useToast } from "../../../components/Toast";
+import { supabaseConfigurado } from "../../../lib/supabase";
+import { mesAtual, primeiroDiaDoMes, rotuloMes } from "../../../lib/dates";
+import { formatBRL } from "../../../lib/format";
+import { calcularTotais } from "../../../lib/totais";
 import {
   listarTransacoesDoMes,
   listarPendenciasDoMes,
   anteciparParcelas,
-} from "../../lib/db";
+} from "../../../lib/db";
 
 export default function Dashboard() {
   const toast = useToast();

@@ -1,7 +1,7 @@
 {
-  "name": "Controle Financeiro",
-  "short_name": "Financeiro",
-  "start_url": "/dashboard",
+  "name": "Meu Painel",
+  "short_name": "Painel",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4472C4",

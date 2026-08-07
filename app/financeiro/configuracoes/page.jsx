@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Plus, Tag as IconeTag, Store, FolderTree, EyeOff, Trash2 } from "lucide-react";
-import { useToast } from "../../components/Toast";
-import { supabaseConfigurado } from "../../lib/supabase";
-import { corDaCategoria } from "../../lib/categorias";
+import { useToast } from "../../../components/Toast";
+import { supabaseConfigurado } from "../../../lib/supabase";
+import { corDaCategoria } from "../../../lib/categorias";
 import {
   listarCategorias,
   listarTodasSubcategorias,
@@ -14,7 +14,7 @@ import {
   criarEstabelecimento,
   listarIgnorados,
   removerIgnorado,
-} from "../../lib/db";
+} from "../../../lib/db";
 
 export default function Configuracoes() {
   const toast = useToast();

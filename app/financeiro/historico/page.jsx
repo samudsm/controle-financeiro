@@ -1,15 +1,15 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { SlidersHorizontal, X, Pencil, Trash2 } from "lucide-react";
-import SwipeCard from "../../components/SwipeCard";
-import EditarTransacaoModal from "../../components/EditarTransacaoModal";
-import { useCatalogo } from "../../hooks/useCatalogo";
-import { useToast } from "../../components/Toast";
-import { supabaseConfigurado } from "../../lib/supabase";
-import { listarTransacoes, deletarTransacao } from "../../lib/db";
-import { formatBRL, formatData } from "../../lib/format";
-import { hojeISO, deslocarMes, primeiroDiaDoMes, mesAtual } from "../../lib/dates";
-import { TIPOS } from "../../lib/categorias";
+import SwipeCard from "../../../components/SwipeCard";
+import EditarTransacaoModal from "../../../components/EditarTransacaoModal";
+import { useCatalogo } from "../../../hooks/useCatalogo";
+import { useToast } from "../../../components/Toast";
+import { supabaseConfigurado } from "../../../lib/supabase";
+import { listarTransacoes, deletarTransacao } from "../../../lib/db";
+import { formatBRL, formatData } from "../../../lib/format";
+import { hojeISO, deslocarMes, primeiroDiaDoMes, mesAtual } from "../../../lib/dates";
+import { TIPOS } from "../../../lib/categorias";
 
 const FILTRO_VAZIO = {
   categoria: "",
