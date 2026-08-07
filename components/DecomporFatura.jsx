@@ -38,9 +38,20 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
   ]);
   const [salvando, setSalvando] = useState(false);
 
-  const somaDistribuida = itens.reduce((s, i) => s + (Number(i.valor) || 0), 0);
+  // O tipo de cada item decide o sinal dentro da fatura:
+  // despesa soma; receita e estorno são créditos e ABATEM o valor da fatura
+  // (uma devolução ou cashback reduz o que você tem a pagar).
+  // Transferência não entra na conta.
+  const valorDe = (i) => Number(i.valor) || 0;
+  const somaDespesas = itens.filter((i) => i.tipo === "despesa").reduce((s, i) => s + valorDe(i), 0);
+  const somaCreditos = itens
+    .filter((i) => i.tipo === "receita" || i.tipo === "estorno")
+    .reduce((s, i) => s + valorDe(i), 0);
+
+  const somaDistribuida = somaDespesas - somaCreditos;
   const bate = Math.abs(somaDistribuida - total) < 0.005;
   const falta = total - somaDistribuida;
+  const temCredito = somaCreditos > 0;
 
   function set(idx, campo, valor) {
     setItens((arr) => arr.map((it, i) => (i === idx ? { ...it, [campo]: valor } : it)));
@@ -115,11 +126,19 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
       rodape={
         <div className="flex items-center justify-between gap-3">
           <div className="text-sm">
-            Distribuído:{" "}
-            <strong className={bate ? "text-receita" : "text-yellow-600"}>
-              {formatBRL(somaDistribuida)}
-            </strong>{" "}
-            / {formatBRL(total)} {bate ? "✅" : "⚠️"}
+            <div>
+              Distribuído:{" "}
+              <strong className={bate ? "text-receita" : "text-yellow-600"}>
+                {formatBRL(somaDistribuida)}
+              </strong>{" "}
+              / {formatBRL(total)} {bate ? "✅" : "⚠️"}
+            </div>
+            {/* Mostra a conta quando há crédito, senão o número parece errado */}
+            {temCredito && (
+              <div className="text-xs text-neutral-500 mt-0.5">
+                {formatBRL(somaDespesas)} em gastos − {formatBRL(somaCreditos)} em créditos
+              </div>
+            )}
           </div>
           <button
             disabled={!bate || salvando}
@@ -136,9 +155,17 @@ export default function DecomporFatura({ fatura, catalogo, onFechar, onSalvo }) 
         separado, com todos os campos normais.
       </p>
 
-      <div className="mb-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs px-3 py-2">
-        <strong>Compra de outro mês?</strong> Mude a data do item. O lançamento passa a
-        contar no painel daquele mês — nos totais, no gráfico e nas análises.
+      <div className="mb-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs px-3 py-2 space-y-1.5">
+        <p>
+          <strong>Compra de outro mês?</strong> Mude a data do item. O lançamento passa a
+          contar no painel daquele mês — nos totais, no gráfico e nas análises.
+        </p>
+        <p>
+          <strong>Veio um crédito na fatura?</strong> Marque o tipo como{" "}
+          <strong>Estorno</strong> e ele abate do total, em vez de somar. Use Estorno para
+          devolução, cashback ou desconto de uma compra; Receita só para dinheiro que
+          entrou de fora.
+        </p>
       </div>
 
       {!bate && (
