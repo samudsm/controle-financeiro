@@ -12,8 +12,8 @@ export default function BottomNav() {
 
   if (!modulo || modulo.nav.length === 0) return null;
 
-  // "Início" volta para a escolha de módulos.
-  const itens = [{ href: "/", rotulo: "Início", Icone: Home }, ...modulo.nav];
+  // "Módulos" volta para a escolha de módulo (evita dois "Início" na barra).
+  const itens = [{ href: "/", rotulo: "Módulos", Icone: Home }, ...modulo.nav];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-neutral-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">

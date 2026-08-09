@@ -1,8 +1,9 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Plus, Pencil, Copy, Trash2, ChevronDown, ChevronUp, GripVertical, Play, X,
+  Plus, Pencil, Copy, Trash2, ChevronDown, ChevronUp, GripVertical, Play, LibraryBig,
 } from "lucide-react";
 import Modal from "../../../components/Modal";
 import EscolherExercicio from "../../../components/academia/EscolherExercicio";
@@ -90,7 +91,7 @@ export default function Fichas() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <h1 className="text-xl font-bold">Fichas</h1>
         <button
           onClick={() => setCriando(true)}
@@ -99,6 +100,13 @@ export default function Fichas() {
           <Plus size={16} /> Nova ficha
         </button>
       </div>
+
+      <Link
+        href="/academia/exercicios"
+        className="flex items-center gap-1.5 text-sm text-marca toque mb-4"
+      >
+        <LibraryBig size={15} /> Biblioteca de exercícios
+      </Link>
 
       {carregando && <p className="text-neutral-400 text-sm">Carregando…</p>}
 
