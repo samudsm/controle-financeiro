@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Plus, Pencil, Copy, Trash2, ChevronDown, ChevronUp, GripVertical, Play, LibraryBig,
+  Link2, Unlink,
 } from "lucide-react";
 import Modal from "../../../components/Modal";
 import EscolherExercicio from "../../../components/academia/EscolherExercicio";
@@ -13,6 +14,7 @@ import {
   listarFichas, criarFicha, atualizarFicha, deletarFicha, duplicarFicha,
   adicionarExercicioNaFicha, atualizarFichaExercicio, removerExercicioDaFicha,
   iniciarSessaoDeFicha, sessaoEmAndamento,
+  agruparComProximo, desagrupar, montarBlocos,
 } from "../../../lib/academia";
 import { formatarDuracao } from "../../../lib/treino";
 
@@ -162,15 +164,47 @@ export default function Fichas() {
               {expandida && (
                 <div className="border-t border-neutral-100 p-3">
                   <div className="space-y-2">
-                    {f.exercicios.map((fe, i) => (
-                      <ExercicioDaFicha
-                        key={fe.id}
-                        fe={fe}
-                        indice={i}
-                        onMudou={carregar}
-                        aoAvisar={toast}
-                      />
-                    ))}
+                    {(() => {
+                      // Exercícios agrupados aparecem dentro de uma caixa só,
+                      // deixando visível que são feitos emendados.
+                      let n = 0;
+                      return montarBlocos(f.exercicios).map((bloco, bi) => {
+                        const itens = bloco.exercicios.map((fe) => {
+                          const indice = n++;
+                          return (
+                            <ExercicioDaFicha
+                              key={fe.id}
+                              fe={fe}
+                              ficha={f}
+                              indice={indice}
+                              ehUltimo={indice === f.exercicios.length - 1}
+                              onMudou={carregar}
+                              aoAvisar={toast}
+                            />
+                          );
+                        });
+
+                        if (bloco.exercicios.length === 1) return itens[0];
+
+                        return (
+                          <div
+                            key={`bloco-${bi}`}
+                            className="rounded-lg border-2 border-marca/30 bg-marca/5 p-2"
+                          >
+                            <p className="text-[10px] uppercase tracking-wide text-marca font-semibold mb-1.5 flex items-center gap-1">
+                              <Link2 size={12} />
+                              {bloco.exercicios.length === 2
+                                ? "Bi-set"
+                                : `Supersérie de ${bloco.exercicios.length}`}
+                              <span className="font-normal text-marca/60 normal-case tracking-normal">
+                                · sem descanso entre eles
+                              </span>
+                            </p>
+                            <div className="space-y-1.5">{itens}</div>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
 
                   {f.exercicios.length === 0 && (
@@ -245,7 +279,7 @@ export default function Fichas() {
 }
 
 /* ---------------- EXERCÍCIO DENTRO DA FICHA ---------------- */
-function ExercicioDaFicha({ fe, indice, onMudou, aoAvisar }) {
+function ExercicioDaFicha({ fe, ficha, indice, ehUltimo, onMudou, aoAvisar }) {
   const [aberto, setAberto] = useState(false);
   const [campos, setCampos] = useState({
     series_alvo: fe.series_alvo ?? 3,
@@ -280,6 +314,28 @@ function ExercicioDaFicha({ fe, indice, onMudou, aoAvisar }) {
       aoAvisar?.("Erro: " + e.message, "erro");
     }
   }
+
+  async function juntar() {
+    try {
+      await agruparComProximo(ficha, fe.id);
+      aoAvisar?.("✓ Bi-set criado");
+      onMudou?.();
+    } catch (e) {
+      aoAvisar?.("Erro: " + e.message, "erro");
+    }
+  }
+
+  async function separar() {
+    try {
+      await desagrupar(ficha, fe.id);
+      aoAvisar?.("✓ Desagrupado");
+      onMudou?.();
+    } catch (e) {
+      aoAvisar?.("Erro: " + e.message, "erro");
+    }
+  }
+
+  const agrupado = fe.superset_grupo != null;
 
   const meta =
     fe.reps_min && fe.reps_max
@@ -353,6 +409,32 @@ function ExercicioDaFicha({ fe, indice, onMudou, aoAvisar }) {
               className="w-full border border-neutral-300 rounded-lg px-3 py-2 text-sm"
             />
           </Campo>
+
+          {/* Bi-set: emenda este exercício no próximo, sem descanso no meio */}
+          <div className="mt-2 pt-2 border-t border-neutral-100">
+            {agrupado ? (
+              <button
+                onClick={separar}
+                className="flex items-center gap-1.5 text-xs text-neutral-600 toque py-1.5"
+              >
+                <Unlink size={13} /> Desfazer o bi-set
+              </button>
+            ) : (
+              !ehUltimo && (
+                <button
+                  onClick={juntar}
+                  className="flex items-center gap-1.5 text-xs text-marca font-medium toque py-1.5"
+                >
+                  <Link2 size={13} /> Fazer bi-set com o próximo exercício
+                </button>
+              )
+            )}
+            {ehUltimo && !agrupado && (
+              <p className="text-[11px] text-neutral-400 py-1.5">
+                Para fazer bi-set, use o botão no exercício de cima.
+              </p>
+            )}
+          </div>
 
           <div className="flex gap-2 mt-2">
             <button onClick={remover} className="flex items-center gap-1 text-xs text-despesa toque px-2 py-1.5">

@@ -12,7 +12,10 @@ import { salvarSerie, adicionarSerie, deletarSerie, atualizarSessaoExercicio } f
 
 // Card de um exercício durante o treino.
 // Mostra na hora o que foi feito da última vez e deixa registrar em poucos toques.
-export default function ExercicioNoTreino({ se, historico, config, onDescanso, onMudou, aoAvisar }) {
+export default function ExercicioNoTreino({
+  se, historico, config, onDescanso, onMudou, aoAvisar,
+  emBiSet = false, ultimoDoBloco = true, proximoDoBloco = null,
+}) {
   const ultima = historico?.[0] || null;
   const seriesAnteriores = useMemo(
     () => (ultima?.series || []).filter((s) => s.concluida && s.tipo !== "aquecimento"),
@@ -83,7 +86,15 @@ export default function ExercicioNoTreino({ se, historico, config, onDescanso, o
       if (comp) setComparacoes((c) => ({ ...c, [linha.id]: comp }));
 
       // Aquecimento não puxa descanso.
-      if (linha.tipo !== "aquecimento") onDescanso?.(se.descanso_seg || 90);
+      // Num bi-set, o descanso só entra depois do último exercício do bloco —
+      // no meio você emenda direto no próximo.
+      if (linha.tipo !== "aquecimento") {
+        if (emBiSet && !ultimoDoBloco) {
+          aoAvisar?.(proximoDoBloco ? `→ Emende no ${proximoDoBloco}` : "→ Emende no próximo");
+        } else {
+          onDescanso?.(se.descanso_seg || 90);
+        }
+      }
       onMudou?.();
     } catch (e) {
       aoAvisar?.("Erro ao salvar: " + e.message, "erro");
@@ -159,6 +170,11 @@ export default function ExercicioNoTreino({ se, historico, config, onDescanso, o
             {volumeHoje > 0 && ` · ${formatarVolume(volumeHoje)}`}
             {se.substituiu && ` · no lugar de ${se.substituiu}`}
           </p>
+          {emBiSet && !ultimoDoBloco && proximoDoBloco && (
+            <p className="text-[11px] text-marca font-medium">
+              emenda no {proximoDoBloco}, sem descanso
+            </p>
+          )}
         </div>
         {concluido && <Check size={20} className="text-receita shrink-0 mt-0.5" />}
       </div>

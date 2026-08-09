@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Flag, Trophy } from "lucide-react";
+import { Plus, Flag, Trophy, Link2 } from "lucide-react";
 import ExercicioNoTreino from "../../../components/academia/ExercicioNoTreino";
 import CronometroDescanso from "../../../components/academia/CronometroDescanso";
 import EscolherExercicio from "../../../components/academia/EscolherExercicio";
@@ -10,7 +10,7 @@ import { useToast } from "../../../components/Toast";
 import { supabaseConfigurado } from "../../../lib/supabase";
 import {
   sessaoEmAndamento, obterSessao, finalizarSessao, deletarSessao,
-  historicoDoExercicio, adicionarExercicioNaSessao, obterConfig,
+  historicoDoExercicio, adicionarExercicioNaSessao, obterConfig, montarBlocos,
 } from "../../../lib/academia";
 import {
   volumeDasSeries, formatarVolume, formatarDuracao, formatarCronometro,
@@ -168,17 +168,39 @@ export default function TreinoEmAndamento() {
       </div>
 
       <div className="space-y-3 mt-3">
-        {sessao.exercicios.map((se) => (
-          <ExercicioNoTreino
-            key={se.id}
-            se={se}
-            historico={historicos[se.exercicio_id] || []}
-            config={config}
-            onDescanso={(seg) => setDescanso({ segundos: seg, chave: Date.now() })}
-            onMudou={carregar}
-            aoAvisar={toast}
-          />
-        ))}
+        {montarBlocos(sessao.exercicios).map((bloco, bi) => {
+          const emBloco = bloco.exercicios.length > 1;
+
+          const itens = bloco.exercicios.map((se, i) => (
+            <ExercicioNoTreino
+              key={se.id}
+              se={se}
+              historico={historicos[se.exercicio_id] || []}
+              config={config}
+              emBiSet={emBloco}
+              ultimoDoBloco={i === bloco.exercicios.length - 1}
+              proximoDoBloco={emBloco ? bloco.exercicios[i + 1]?.nome : null}
+              onDescanso={(seg) => setDescanso({ segundos: seg, chave: Date.now() })}
+              onMudou={carregar}
+              aoAvisar={toast}
+            />
+          ));
+
+          if (!emBloco) return itens[0];
+
+          return (
+            <div key={`bloco-${bi}`} className="rounded-xl border-2 border-marca/30 bg-marca/5 p-2">
+              <p className="text-[10px] uppercase tracking-wide text-marca font-semibold mb-2 flex items-center gap-1 px-1">
+                <Link2 size={12} />
+                {bloco.exercicios.length === 2 ? "Bi-set" : `Supersérie de ${bloco.exercicios.length}`}
+                <span className="font-normal text-marca/60 normal-case tracking-normal">
+                  · descanso só no fim do bloco
+                </span>
+              </p>
+              <div className="space-y-2">{itens}</div>
+            </div>
+          );
+        })}
       </div>
 
       <button
