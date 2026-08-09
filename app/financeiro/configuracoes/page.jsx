@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Plus, Tag as IconeTag, Store, FolderTree, EyeOff, Trash2 } from "lucide-react";
+import SeletorTema from "../../../components/SeletorTema";
 import { useToast } from "../../../components/Toast";
 import { supabaseConfigurado } from "../../../lib/supabase";
 import { corDaCategoria } from "../../../lib/categorias";
@@ -113,8 +114,13 @@ export default function Configuracoes() {
     <div className="space-y-4">
       <h1 className="text-xl font-bold mb-3">Configurações</h1>
 
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
+        <h2 className="font-semibold mb-3">Tema</h2>
+        <SeletorTema />
+      </section>
+
       {/* CATEGORIAS E SUBCATEGORIAS */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-1 flex items-center gap-2">
           <FolderTree size={18} className="text-marca" /> Categorias e subcategorias
         </h2>
@@ -154,7 +160,7 @@ export default function Configuracoes() {
 
         <div className="flex gap-2 mt-4 pt-3 border-t border-neutral-200">
           <select
-            className="border border-neutral-300 rounded-lg px-2 bg-white text-sm"
+            className="border border-neutral-300 rounded-lg px-2 bg-superficie text-sm"
             value={novaSub.categoriaId}
             onChange={(e) => setNovaSub((s) => ({ ...s, categoriaId: e.target.value }))}
           >
@@ -203,7 +209,7 @@ export default function Configuracoes() {
       />
 
       {/* IGNORADOS NA IMPORTAÇÃO */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-1 flex items-center gap-2">
           <EyeOff size={18} className="text-marca" /> Não mostrar na importação
         </h2>
@@ -258,7 +264,7 @@ export default function Configuracoes() {
 
 function Lista({ titulo, descricao, Icone, itens, valor, setValor, onAdicionar, placeholder }) {
   return (
-    <section className="bg-white rounded-xl border border-neutral-200 p-4">
+    <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
       <h2 className="font-semibold mb-1 flex items-center gap-2">
         <Icone size={18} className="text-marca" /> {titulo}
       </h2>

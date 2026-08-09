@@ -26,7 +26,7 @@ export default function GraficoPizza({ transacoes }) {
   }
 
   return (
-    <section className="mt-6 bg-white rounded-xl border border-neutral-200 p-4">
+    <section className="mt-6 bg-superficie rounded-xl border border-neutral-200 p-4">
       <h2 className="font-semibold mb-1">Distribuição de gastos</h2>
       <p className="text-xs text-neutral-500 mb-2">Total de despesas: {formatBRL(total)}</p>
       <div className="w-full h-72">
@@ -43,13 +43,21 @@ export default function GraficoPizza({ transacoes }) {
               label={({ percent }) => (percent > 0.06 ? `${(percent * 100).toFixed(0)}%` : "")}
               labelLine={false}
             >
+              {/* O espaçador entre fatias é a própria superfície, não um traço */}
               {dados.map((d) => (
-                <Cell key={d.name} fill={d.cor} stroke="#fff" strokeWidth={2} />
+                <Cell key={d.name} fill={d.cor} stroke="var(--superficie)" strokeWidth={2} />
               ))}
             </Pie>
             <Tooltip
               formatter={(value, name) => [formatBRL(value), name]}
-              contentStyle={{ borderRadius: 8, border: "1px solid #e5e5e5", fontSize: 13 }}
+              contentStyle={{
+                borderRadius: 8,
+                border: "1px solid var(--n200)",
+                background: "var(--superficie)",
+                color: "var(--n900)",
+                fontSize: 13,
+              }}
+              itemStyle={{ color: "var(--n900)" }}
             />
             <Legend
               formatter={(value) => <span className="text-xs text-neutral-600">{value}</span>}

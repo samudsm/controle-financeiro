@@ -183,7 +183,7 @@ function Secao({ titulo, cor, onNovo, itens, carregando, render }) {
 function Cartao({ p, corValor, status, acao, onEditar, onExcluir }) {
   const Icone = status.Icone;
   return (
-    <div className="bg-white rounded-xl border border-neutral-200 p-3">
+    <div className="bg-superficie rounded-xl border border-neutral-200 p-3">
       <div className="flex items-center justify-between">
         <div>
           <p className="font-medium">{p.descricao}</p>
@@ -313,7 +313,7 @@ function FormPendencia({ pendencia, tipo, mes, onFechar, onSalvo }) {
 function ConfirmarExclusao({ pendencia, onConfirmar, onCancelar }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl p-5 max-w-sm w-full">
+      <div className="bg-superficie rounded-2xl p-5 max-w-sm w-full">
         <h3 className="font-semibold mb-2">Excluir pendência?</h3>
         <p className="text-sm text-neutral-600 mb-4">
           <strong>{pendencia.descricao}</strong> — {formatBRL(Math.abs(pendencia.valor))}

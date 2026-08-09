@@ -19,7 +19,7 @@ export default function RankingGastos({ transacoes }) {
   const topLocais = Object.values(porLocal).sort((a, b) => b.total - a.total).slice(0, 5);
   return (
     <div className="mt-6 grid gap-4 sm:grid-cols-2">
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-3 flex items-center gap-2"><Trophy size={18} className="text-despesa" /> Maiores gastos</h2>
         <div className="space-y-2">
           {topTransacoes.map((t, i) => (
@@ -31,7 +31,7 @@ export default function RankingGastos({ transacoes }) {
           ))}
         </div>
       </section>
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-3 flex items-center gap-2"><Store size={18} className="text-marca" /> Onde mais gasta</h2>
         <div className="space-y-2">
           {topLocais.map((l, i) => (

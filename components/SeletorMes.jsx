@@ -20,7 +20,7 @@ export default function SeletorMes({ mes, onChange }) {
 
   return (
     <div
-      className="flex items-center justify-between bg-white rounded-xl border border-neutral-200 px-2 py-2 select-none touch-pan-y"
+      className="flex items-center justify-between bg-superficie rounded-xl border border-neutral-200 px-2 py-2 select-none touch-pan-y"
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
     >

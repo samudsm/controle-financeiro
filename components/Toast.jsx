@@ -21,8 +21,10 @@ export function ToastProvider({ children }) {
         {toasts.map((t) => (
           <div
             key={t.id}
+            // zinc fixo: o aviso é escuro nos dois temas. A escala neutra se
+            // inverte no tema escuro e deixaria texto branco sobre fundo claro.
             className={`toast-in rounded-lg px-4 py-3 text-white shadow-lg text-sm ${
-              t.tipo === "erro" ? "bg-despesa" : "bg-neutral-800"
+              t.tipo === "erro" ? "bg-despesa" : "bg-zinc-800"
             }`}
           >
             {t.mensagem}

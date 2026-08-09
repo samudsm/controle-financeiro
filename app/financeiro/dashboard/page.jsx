@@ -149,7 +149,7 @@ export default function Dashboard() {
             {parcelas.map((t) => (
               <div
                 key={t.id}
-                className="bg-white rounded-xl border border-neutral-200 p-3 flex items-center justify-between"
+                className="bg-superficie rounded-xl border border-neutral-200 p-3 flex items-center justify-between"
               >
                 <div>
                   <p className="font-medium">
@@ -182,7 +182,7 @@ export default function Dashboard() {
             {fixos.map((t) => (
               <div
                 key={t.id}
-                className="bg-white rounded-xl border border-neutral-200 p-3 flex items-center justify-between"
+                className="bg-superficie rounded-xl border border-neutral-200 p-3 flex items-center justify-between"
               >
                 <div>
                   <p className="font-medium">{t.descricao}</p>
@@ -228,7 +228,7 @@ export default function Dashboard() {
 
 function Kpi({ titulo, valor, cor, Icone, real, previsto, rotuloPrevisto, extra }) {
   return (
-    <div className="bg-white rounded-xl border border-neutral-200 p-4">
+    <div className="bg-superficie rounded-xl border border-neutral-200 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-neutral-600">
           <Icone size={18} />
@@ -248,7 +248,7 @@ function Kpi({ titulo, valor, cor, Icone, real, previsto, rotuloPrevisto, extra 
 function ConfirmarAntecipacao({ transacao, mes, onConfirmar, onCancelar }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl p-5 max-w-sm w-full">
+      <div className="bg-superficie rounded-2xl p-5 max-w-sm w-full">
         <h3 className="font-semibold mb-2">Antecipar parcelas?</h3>
         <p className="text-sm text-neutral-600 mb-4">
           Isso moverá as próximas parcelas de <strong>{transacao.descricao}</strong> (após a{" "}

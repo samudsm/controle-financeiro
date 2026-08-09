@@ -117,7 +117,7 @@ function SessaoCard({ s, expandida, onAlternar, onExcluir }) {
   const volume = volumeDasSeries(todas);
 
   return (
-    <section className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+    <section className="bg-superficie rounded-xl border border-neutral-200 overflow-hidden">
       <button onClick={onAlternar} className="w-full flex items-center gap-3 p-3 text-left toque">
         <div className="flex-1 min-w-0">
           <p className="font-semibold truncate">{s.nome}</p>

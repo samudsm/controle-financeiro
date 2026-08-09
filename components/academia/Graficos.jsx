@@ -2,7 +2,10 @@
 import { useState } from "react";
 
 // Cor única: uma série = uma cor. A cor não codifica o tamanho da barra.
-const COR = "#2a78d6";
+// Vem de variável CSS para ter um passo próprio no tema escuro.
+const COR = "var(--cat-1)";
+const TRILHO = "var(--n200)";   // fundo da barra
+const CONTORNO = "var(--superficie)"; // anel dos pontos, na cor da superfície
 
 /* ---------------- LINHA (evolução ao longo do tempo) ---------------- */
 // Usa SVG para desenhar; o valor final fica rotulado direto no gráfico.
@@ -75,7 +78,7 @@ export function GraficoLinha({ pontos = [], formatar = (v) => v, altura = 140 })
               cy={c.y}
               r={i === coordenadas.length - 1 ? 3 : 2.2}
               fill={COR}
-              stroke="#fff"
+              stroke={CONTORNO}
               strokeWidth="1.5"
               vectorEffect="non-scaling-stroke"
               onMouseEnter={() => setAtivo(i)}
@@ -87,7 +90,7 @@ export function GraficoLinha({ pontos = [], formatar = (v) => v, altura = 140 })
 
         {/* Rótulo direto no último ponto — o número que mais importa */}
         <span
-          className="absolute text-xs font-semibold tabular-nums bg-white/90 px-1 rounded"
+          className="absolute text-xs font-semibold tabular-nums bg-superficie/90 px-1 rounded"
           style={{ left: "auto", right: 0, top: `${(ultimo.y / A) * 100}%`, transform: "translateY(-130%)" }}
         >
           {formatar(ultimo.valor)}
@@ -129,7 +132,7 @@ export function GraficoColunas({ dados = [], formatar = (v) => v, altura = 120 }
               className="rounded-t w-full"
               style={{
                 height: `${Math.max((d.valor / max) * 100, d.valor > 0 ? 3 : 1)}%`,
-                background: d.valor > 0 ? COR : "#e5e5e5",
+                background: d.valor > 0 ? COR : TRILHO,
               }}
             />
           </div>

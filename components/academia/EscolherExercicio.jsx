@@ -76,7 +76,7 @@ export default function EscolherExercicio({ onFechar, onEscolher, aoAvisar }) {
             <select
               value={novo.grupo_muscular}
               onChange={(e) => setNovo((n) => ({ ...n, grupo_muscular: e.target.value }))}
-              className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-white toque"
+              className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-superficie toque"
             >
               {GRUPOS_MUSCULARES.map((g) => (
                 <option key={g} value={g}>{g}</option>
@@ -88,7 +88,7 @@ export default function EscolherExercicio({ onFechar, onEscolher, aoAvisar }) {
             <select
               value={novo.equipamento}
               onChange={(e) => setNovo((n) => ({ ...n, equipamento: e.target.value }))}
-              className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-white toque"
+              className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-superficie toque"
             >
               {EQUIPAMENTOS.map((q) => (
                 <option key={q} value={q}>{q}</option>

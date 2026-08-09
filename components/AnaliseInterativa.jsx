@@ -7,7 +7,7 @@ import { formatBRL, formatData } from "../lib/format";
 
 // Cor única para as visões de série única (por dia, por tag, por local).
 // Regra: uma série = uma cor; a cor não codifica o tamanho da barra.
-const COR_UNICA = "#2a78d6";
+const COR_UNICA = "var(--cat-1)";
 
 const ABAS = [
   { id: "categoria", rotulo: "Categorias" },
@@ -77,7 +77,7 @@ export default function AnaliseInterativa({ transacoes }) {
   if (despesas.length === 0) return null;
 
   return (
-    <section className="mt-6 bg-white rounded-xl border border-neutral-200 p-4">
+    <section className="mt-6 bg-superficie rounded-xl border border-neutral-200 p-4">
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-semibold">Explorar gastos</h2>
         <button

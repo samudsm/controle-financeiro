@@ -151,7 +151,7 @@ function CardExercicio({ ex, expandido, onAlternar, onMudou, aoAvisar }) {
   const volumeTotal = volumeDasSeries(todas);
 
   return (
-    <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+    <div className="bg-superficie rounded-xl border border-neutral-200 overflow-hidden">
       <button onClick={onAlternar} className="w-full flex items-center gap-2 px-3 py-2.5 text-left toque">
         <div className="flex-1 min-w-0">
           <p className="font-medium truncate">{ex.nome}</p>

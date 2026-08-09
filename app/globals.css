@@ -2,12 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =====================================================================
+   TEMA CLARO E ESCURO
+   ---------------------------------------------------------------------
+   A escala de cinzas é definida aqui como variáveis e consumida pelo
+   Tailwind. No tema escuro ela é INVERTIDA: os tons baixos (100, 200),
+   usados em fundos e bordas, ficam escuros; os altos (400 a 700), usados
+   em texto, ficam claros. Assim as classes já espalhadas pelo app
+   (bg-neutral-100, text-neutral-500, border-neutral-200) passam a
+   funcionar nos dois temas sem precisar de variante em cada elemento.
+
+   As cores de dado (marca, receita, despesa e as 8 categorias) têm um
+   valor próprio por tema, validado para daltonismo e contraste contra a
+   superfície de cada modo — não é o mesmo tom clareado.
+   ===================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --plano: #f5f6f8;        /* fundo da página */
+  --superficie: #ffffff;   /* fundo de card */
+  --superficie-2: #fafafa; /* card sobre card */
+
+  --n50:  #fafafa;
+  --n100: #f5f5f5;
+  --n200: #e5e5e5;
+  --n300: #d4d4d4;
+  --n400: #a3a3a3;
+  --n500: #737373;
+  --n600: #525252;
+  --n700: #404040;
+  --n800: #262626;
+  --n900: #171717;
+
+  --marca: #4472c4;
+  --receita: #70ad47;
+  --despesa: #c55a11;
+
+  /* Avisos (amarelo) e destaques informativos (azul) */
+  --y50:  #fefce8;
+  --y100: #fef9c3;
+  --y300: #fde047;
+  --y600: #ca8a04;
+  --y700: #a16207;
+  --y800: #854d0e;
+  --y900: #713f12;
+
+  --b50:  #eff6ff;
+  --b100: #dbeafe;
+  --b200: #bfdbfe;
+  --b900: #1e3a8a;
+
+  /* Categorias do financeiro (paleta validada para o fundo claro) */
+  --cat-1: #2a78d6;
+  --cat-2: #eb6834;
+  --cat-3: #1baf7a;
+  --cat-4: #eda100;
+  --cat-5: #e87ba4;
+  --cat-6: #008300;
+  --cat-7: #4a3aa7;
+  --cat-8: #e34948;
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  --plano: #0d0d0d;
+  --superficie: #1a1a19;
+  --superficie-2: #222220;
+
+  /* Invertida: 100–300 viram fundos e bordas escuras; 400–700, texto claro */
+  --n50:  #1f1f1e;
+  --n100: #26262a;
+  --n200: #33333a;
+  --n300: #45454c;
+  --n400: #898781;
+  --n500: #a8a69e;
+  --n600: #c3c2b7;
+  --n700: #d9d8d0;
+  --n800: #ebeae4;
+  --n900: #ffffff;
+
+  --marca: #3987e5;
+  --receita: #199e70;
+  --despesa: #e66767;
+
+  /* Avisos no escuro: fundo profundo e texto claro, mantendo a matiz.
+     Clarear o amarelo claro do tema claro daria um bloco ofuscante. */
+  --y50:  #2a2412;
+  --y100: #3a3116;
+  --y300: #5c4a1a;
+  --y600: #d8a72a;
+  --y700: #e6ba45;
+  --y800: #f5cf5e;
+  --y900: #ffe08a;
+
+  --b50:  #12233a;
+  --b100: #16304d;
+  --b200: #1e4470;
+  --b900: #a8cbf0;
+
+  /* Mesmas oito matizes, passo próprio para o fundo escuro */
+  --cat-1: #3987e5;
+  --cat-2: #d95926;
+  --cat-3: #199e70;
+  --cat-4: #c98500;
+  --cat-5: #d55181;
+  --cat-6: #008300;
+  --cat-7: #9085e9;
+  --cat-8: #e66767;
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  background: #f5f6f8;
-  color: #1f2430;
+  background: var(--plano);
+  color: var(--n900);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -29,6 +140,19 @@ input,
 select,
 textarea {
   font-size: 16px; /* evita zoom automático no iOS */
+}
+
+/* Campos de formulário acompanham o tema */
+input,
+select,
+textarea {
+  background-color: var(--superficie);
+  color: var(--n900);
+}
+
+/* O ícone do seletor de data fica invisível no escuro sem isto */
+:root.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.6);
 }
 
 @keyframes toast-in {

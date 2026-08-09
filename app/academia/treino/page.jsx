@@ -150,7 +150,7 @@ export default function TreinoEmAndamento() {
   return (
     <div className="pb-4">
       {/* Cabeçalho fixo com o cronômetro do treino */}
-      <div className="sticky top-0 -mx-4 px-4 py-2.5 bg-white/95 backdrop-blur border-b border-neutral-200 z-30">
+      <div className="sticky top-0 -mx-4 px-4 py-2.5 bg-superficie/95 backdrop-blur border-b border-neutral-200 z-30">
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <h1 className="font-bold truncate">{sessao.nome}</h1>
@@ -300,7 +300,7 @@ function ResumoFinal({ resumo }) {
 
 function Metrica({ rotulo, valor }) {
   return (
-    <div className="bg-white rounded-xl border border-neutral-200 p-3">
+    <div className="bg-superficie rounded-xl border border-neutral-200 p-3">
       <p className="text-xs text-neutral-500">{rotulo}</p>
       <p className="text-xl font-bold tabular-nums">{valor}</p>
     </div>

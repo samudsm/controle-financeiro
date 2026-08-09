@@ -60,7 +60,7 @@ export default function CamposTransacao({ t, set, catalogo, autoSugerir = true }
       <div className="grid grid-cols-2 gap-3">
         <Campo rotulo="Categoria">
           <select
-            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white"
+            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-superficie"
             value={t.categoria || ""}
             onChange={(e) => trocarCategoria(e.target.value)}
           >
@@ -75,7 +75,7 @@ export default function CamposTransacao({ t, set, catalogo, autoSugerir = true }
 
         <Campo rotulo="Subcategoria">
           <select
-            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
+            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-superficie disabled:bg-neutral-100 disabled:text-neutral-400"
             value={t.subcategoria || ""}
             disabled={!t.categoria}
             onChange={(e) => set("subcategoria", e.target.value)}
@@ -99,7 +99,7 @@ export default function CamposTransacao({ t, set, catalogo, autoSugerir = true }
       <div className="grid grid-cols-2 gap-3">
         <Campo rotulo="Tipo">
           <select
-            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white"
+            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-superficie"
             value={t.tipo || "despesa"}
             onChange={(e) => set("tipo", e.target.value)}
           >
@@ -136,7 +136,7 @@ export default function CamposTransacao({ t, set, catalogo, autoSugerir = true }
         </Campo>
         <Campo rotulo="Forma de pagamento">
           <select
-            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white"
+            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-superficie"
             value={t.forma_pagamento || ""}
             onChange={(e) => set("forma_pagamento", e.target.value)}
           >

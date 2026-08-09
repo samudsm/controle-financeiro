@@ -169,7 +169,7 @@ export default function AcademiaInicio() {
               <Link
                 key={s.id}
                 href={`/academia/historico?sessao=${s.id}`}
-                className="flex items-center gap-3 bg-white rounded-xl border border-neutral-200 p-3 toque"
+                className="flex items-center gap-3 bg-superficie rounded-xl border border-neutral-200 p-3 toque"
               >
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{s.nome}</p>
@@ -233,7 +233,7 @@ export default function AcademiaInicio() {
 
 function Card({ rotulo, valor, Icone, largo }) {
   return (
-    <div className={`bg-white rounded-xl border border-neutral-200 p-3 ${largo ? "col-span-2" : ""}`}>
+    <div className={`bg-superficie rounded-xl border border-neutral-200 p-3 ${largo ? "col-span-2" : ""}`}>
       <p className="text-xs text-neutral-500">{rotulo}</p>
       <p className="text-xl font-bold tabular-nums flex items-center gap-1.5">
         {Icone && <Icone size={18} className="text-despesa" />}

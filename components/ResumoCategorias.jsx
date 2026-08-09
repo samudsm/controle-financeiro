@@ -24,7 +24,7 @@ export default function ResumoCategorias({ transacoes }) {
   const lista = Object.entries(grupos).sort((a, b) => b[1].total - a[1].total);
   if (lista.length === 0) return null;
   return (
-    <section className="mt-6 bg-white rounded-xl border border-neutral-200 p-4">
+    <section className="mt-6 bg-superficie rounded-xl border border-neutral-200 p-4">
       <h2 className="font-semibold mb-3">Resumo por categoria</h2>
       <div className="divide-y divide-neutral-100">
         {lista.map(([cat, info], i) => {

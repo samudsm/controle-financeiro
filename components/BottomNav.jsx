@@ -16,7 +16,7 @@ export default function BottomNav() {
   const itens = [{ href: "/", rotulo: "Módulos", Icone: Home }, ...modulo.nav];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-neutral-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-superficie border-t border-neutral-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
       <div
         className="mx-auto max-w-3xl grid"
         style={{ gridTemplateColumns: `repeat(${itens.length}, minmax(0, 1fr))` }}

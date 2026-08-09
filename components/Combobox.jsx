@@ -50,7 +50,7 @@ export default function Combobox({
 
   return (
     <div className="relative" ref={ref}>
-      <div className="flex items-center border border-neutral-300 rounded-lg bg-white">
+      <div className="flex items-center border border-neutral-300 rounded-lg bg-superficie">
         <input
           className="flex-1 px-3 py-2 rounded-lg outline-none toque"
           value={texto}
@@ -73,7 +73,7 @@ export default function Combobox({
       </div>
 
       {aberto && (filtradas.length > 0 || podeCriar) && (
-        <div className="absolute z-30 mt-1 w-full bg-white border border-neutral-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-30 mt-1 w-full bg-superficie border border-neutral-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {filtradas.map((o) => (
             <button
               key={o.valor}

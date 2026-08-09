@@ -5,6 +5,7 @@ import {
   Plus, Trash2, Check, ArrowLeftRight,
 } from "lucide-react";
 import { GraficoLinha } from "../../../components/academia/Graficos";
+import SeletorTema from "../../../components/SeletorTema";
 import Modal from "../../../components/Modal";
 import { useToast } from "../../../components/Toast";
 import { supabaseConfigurado } from "../../../lib/supabase";
@@ -160,7 +161,7 @@ function AbaCorpo({ toast }) {
   return (
     <div className="space-y-4">
       {/* PESO CORPORAL */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-3 flex items-center gap-2">
           <Scale size={17} className="text-marca" /> Peso corporal
         </h2>
@@ -220,7 +221,7 @@ function AbaCorpo({ toast }) {
       </section>
 
       {/* MEDIDAS */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-3 flex items-center gap-2">
           <Ruler size={17} className="text-marca" /> Medidas
         </h2>
@@ -228,7 +229,7 @@ function AbaCorpo({ toast }) {
         <select
           value={medidaVista}
           onChange={(e) => setMedidaVista(e.target.value)}
-          className="w-full border border-neutral-300 rounded-lg px-3 py-2 bg-white mb-3"
+          className="w-full border border-neutral-300 rounded-lg px-3 py-2 bg-superficie mb-3"
         >
           {tiposUsados.map((t) => (
             <option key={t} value={t}>{t}</option>
@@ -256,7 +257,7 @@ function AbaCorpo({ toast }) {
           <select
             value={novaMedida.tipo}
             onChange={(e) => setNovaMedida((m) => ({ ...m, tipo: e.target.value }))}
-            className="flex-1 min-w-0 border border-neutral-300 rounded-lg px-2 py-2 bg-white text-sm"
+            className="flex-1 min-w-0 border border-neutral-300 rounded-lg px-2 py-2 bg-superficie text-sm"
           >
             {tiposUsados.map((t) => (
               <option key={t} value={t}>{t}</option>
@@ -278,7 +279,7 @@ function AbaCorpo({ toast }) {
       </section>
 
       {/* FOTOS */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-semibold flex items-center gap-2">
             <Camera size={17} className="text-marca" /> Fotos
@@ -369,7 +370,7 @@ function CompararFotos({ fotos, onFechar }) {
             <select
               value={valor}
               onChange={(e) => setar(e.target.value)}
-              className="w-full border border-neutral-300 rounded-lg px-2 py-1.5 text-xs bg-white mb-1"
+              className="w-full border border-neutral-300 rounded-lg px-2 py-1.5 text-xs bg-superficie mb-1"
             >
               {ordenadas.map((f) => (
                 <option key={f.id} value={f.id}>
@@ -437,7 +438,7 @@ function AbaMetas({ toast }) {
         {metas.map((m) => (
           <div
             key={m.id}
-            className={`bg-white rounded-xl border p-3 flex items-center gap-3 ${
+            className={`bg-superficie rounded-xl border p-3 flex items-center gap-3 ${
               m.concluida ? "border-receita/40 bg-receita/5" : "border-neutral-200"
             }`}
           >
@@ -535,7 +536,7 @@ function FormMeta({ exercicios, onFechar, onSalvo, toast }) {
       <select
         value={m.tipo}
         onChange={(e) => setM((x) => ({ ...x, tipo: e.target.value }))}
-        className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-white mb-3"
+        className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-superficie mb-3"
       >
         <option value="exercicio">Exercício (carga × reps)</option>
         <option value="peso_corporal">Peso corporal</option>
@@ -557,7 +558,7 @@ function FormMeta({ exercicios, onFechar, onSalvo, toast }) {
           <select
             value={m.exercicio_id}
             onChange={(e) => setM((x) => ({ ...x, exercicio_id: e.target.value }))}
-            className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-white mb-3"
+            className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-superficie mb-3"
           >
             <option value="">Escolha…</option>
             {exercicios.map((e) => (
@@ -629,7 +630,7 @@ function AbaFerramentas() {
 
   return (
     <div className="space-y-4">
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-3">Carga de trabalho</h2>
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -658,7 +659,7 @@ function AbaFerramentas() {
       </section>
 
       {/* AQUECIMENTO (item 12) */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-1">Aquecimento sugerido</h2>
         <p className="text-xs text-neutral-500 mb-3">Progressão até a carga de trabalho</p>
         <div className="space-y-1.5">
@@ -682,7 +683,7 @@ function AbaFerramentas() {
       </section>
 
       {/* ANILHAS (item 13) */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-1">Anilhas por lado</h2>
         <p className="text-xs text-neutral-500 mb-3">Para chegar em {formatarPeso(Number(carga))} kg</p>
 
@@ -772,8 +773,16 @@ function AbaAjustes({ toast }) {
 
   return (
     <div className="space-y-4">
-      <section className="bg-white rounded-xl border border-neutral-200 p-4 space-y-3">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4 space-y-3">
         <h2 className="font-semibold">Preferências</h2>
+
+        <div>
+          <Rotulo>Tema</Rotulo>
+          <SeletorTema />
+          <p className="text-xs text-neutral-400 mt-1">
+            O tema escuro cansa menos a vista na academia.
+          </p>
+        </div>
 
         <div>
           <Rotulo>Esforço percebido</Rotulo>
@@ -845,7 +854,7 @@ function AbaAjustes({ toast }) {
         </div>
       </section>
 
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-1 flex items-center gap-2">
           <Download size={17} className="text-marca" /> Seus dados
         </h2>

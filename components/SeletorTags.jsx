@@ -116,7 +116,7 @@ export default function SeletorTags({ valor = [], onChange, opcoes = [], onCriar
         // lista fecha e o clique se perde — era por isso que escolher uma tag
         // existente não funcionava, enquanto criar uma nova (via Enter) sim.
         <div
-          className="absolute z-30 mt-1 w-full bg-white border border-neutral-200 rounded-lg shadow-lg max-h-52 overflow-auto"
+          className="absolute z-30 mt-1 w-full bg-superficie border border-neutral-200 rounded-lg shadow-lg max-h-52 overflow-auto"
           onMouseDown={(e) => e.preventDefault()}
         >
           {disponiveis.map((o) => (

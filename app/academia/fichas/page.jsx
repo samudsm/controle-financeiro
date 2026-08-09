@@ -131,7 +131,7 @@ export default function Fichas() {
         {fichas.map((f) => {
           const expandida = aberta === f.id;
           return (
-            <section key={f.id} className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+            <section key={f.id} className="bg-superficie rounded-xl border border-neutral-200 overflow-hidden">
               <div className="flex items-center gap-2 p-3">
                 <button
                   onClick={() => setAberta(expandida ? null : f.id)}

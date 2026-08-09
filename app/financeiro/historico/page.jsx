@@ -126,11 +126,11 @@ export default function Historico() {
 
       {/* Filtros (accordion) */}
       {abertoFiltros && (
-        <div className="bg-white border border-neutral-200 rounded-xl p-3 mb-3 space-y-3">
+        <div className="bg-superficie border border-neutral-200 rounded-xl p-3 mb-3 space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Campo rotulo="Categoria">
               <select
-                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-white"
+                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-superficie"
                 value={filtros.categoria}
                 onChange={(e) => set2({ categoria: e.target.value, subcategoria: "" })}
               >
@@ -144,7 +144,7 @@ export default function Historico() {
             </Campo>
             <Campo rotulo="Tipo">
               <select
-                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-white"
+                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-superficie"
                 value={filtros.tipo}
                 onChange={(e) => set("tipo", e.target.value)}
               >
@@ -161,7 +161,7 @@ export default function Historico() {
           <div className="grid grid-cols-2 gap-3">
             <Campo rotulo="Subcategoria">
               <select
-                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
+                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-superficie disabled:bg-neutral-100 disabled:text-neutral-400"
                 value={filtros.subcategoria}
                 disabled={!filtros.categoria}
                 onChange={(e) => set("subcategoria", e.target.value)}
@@ -176,7 +176,7 @@ export default function Historico() {
             </Campo>
             <Campo rotulo="Tag">
               <select
-                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-white"
+                className="w-full border border-neutral-300 rounded-lg px-2 py-2 bg-superficie"
                 value={filtros.tag}
                 onChange={(e) => set("tag", e.target.value)}
               >
@@ -218,7 +218,7 @@ export default function Historico() {
           <div className="flex items-center justify-between">
             <Campo rotulo="Status">
               <select
-                className="border border-neutral-300 rounded-lg px-2 py-2 bg-white"
+                className="border border-neutral-300 rounded-lg px-2 py-2 bg-superficie"
                 value={filtros.status}
                 onChange={(e) => set("status", e.target.value)}
               >

@@ -1,13 +1,19 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { MODULOS } from "../lib/modulos";
+import SeletorTema from "../components/SeletorTema";
 
 // Tela inicial: escolhe o módulo.
 export default function Home() {
   return (
     <div>
-      <h1 className="text-2xl font-bold">Meu Painel</h1>
-      <p className="text-sm text-neutral-500 mt-1 mb-5">Escolha um módulo</p>
+      <div className="flex items-start justify-between gap-3 mb-5">
+        <div>
+          <h1 className="text-2xl font-bold">Meu Painel</h1>
+          <p className="text-sm text-neutral-500 mt-1">Escolha um módulo</p>
+        </div>
+        <SeletorTema compacto />
+      </div>
 
       <div className="space-y-3">
         {MODULOS.map((m) => {
@@ -39,7 +45,7 @@ export default function Home() {
             <Link
               key={m.id}
               href={m.href}
-              className="flex items-center gap-3 bg-white rounded-xl border border-neutral-200 p-4 toque hover:border-neutral-300 transition-colors"
+              className="flex items-center gap-3 bg-superficie rounded-xl border border-neutral-200 p-4 toque hover:border-neutral-300 transition-colors"
             >
               {conteudo}
             </Link>
@@ -48,7 +54,7 @@ export default function Home() {
             <Link
               key={m.id}
               href={m.href}
-              className="flex items-center gap-3 bg-white rounded-xl border border-dashed border-neutral-300 p-4 toque opacity-70"
+              className="flex items-center gap-3 bg-superficie rounded-xl border border-dashed border-neutral-300 p-4 toque opacity-70"
             >
               {conteudo}
             </Link>

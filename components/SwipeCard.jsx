@@ -48,7 +48,7 @@ export default function SwipeCard({ children, onEditar, onApagar }) {
 
       {/* Card na frente */}
       <div
-        className="relative bg-white touch-pan-y"
+        className="relative bg-superficie touch-pan-y"
         style={{ transform: `translateX(${dx}px)`, transition: arrastando.current ? "none" : "transform 0.2s" }}
         onPointerDown={down}
         onPointerMove={move}

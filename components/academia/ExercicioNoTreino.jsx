@@ -158,7 +158,7 @@ export default function ExercicioNoTreino({
   return (
     <section
       className={`rounded-xl border p-3 ${
-        concluido ? "border-receita/40 bg-receita/5" : "border-neutral-200 bg-white"
+        concluido ? "border-receita/40 bg-receita/5" : "border-neutral-200 bg-superficie"
       }`}
     >
       {/* Cabeçalho */}
@@ -428,7 +428,7 @@ export default function ExercicioNoTreino({
 
 function Info({ rotulo, valor }) {
   return (
-    <div className="bg-white rounded-lg border border-neutral-200 px-2 py-1.5">
+    <div className="bg-superficie rounded-lg border border-neutral-200 px-2 py-1.5">
       <p className="text-[10px] text-neutral-400 leading-tight">{rotulo}</p>
       <p className="font-semibold text-sm tabular-nums">{valor}</p>
     </div>

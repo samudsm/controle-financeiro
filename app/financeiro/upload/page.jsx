@@ -229,7 +229,7 @@ export default function UploadPage() {
         <h1 className="text-xl font-bold mb-3">Preencher transações</h1>
         <div className="space-y-4">
           {itens.map((it, idx) => (
-            <div key={idx} className="bg-white rounded-xl border border-neutral-200 p-3">
+            <div key={idx} className="bg-superficie rounded-xl border border-neutral-200 p-3">
               <div className="flex items-center justify-between mb-2 text-sm text-neutral-500">
                 <span>{it.dataBR}</span>
                 {it._fatura && (
@@ -293,7 +293,7 @@ export default function UploadPage() {
         onDragOver={(e) => e.preventDefault()}
         onDrop={onDrop}
         onClick={() => inputRef.current?.click()}
-        className="border-2 border-dashed border-neutral-300 rounded-2xl p-8 text-center cursor-pointer bg-white hover:border-marca transition"
+        className="border-2 border-dashed border-neutral-300 rounded-2xl p-8 text-center cursor-pointer bg-superficie hover:border-marca transition"
       >
         {processandoPDF ? (
           <div className="flex flex-col items-center gap-2 text-neutral-500">
@@ -341,7 +341,7 @@ export default function UploadPage() {
 
           <div className="space-y-2">
             {visiveis.map((t) => (
-              <div key={t.i} className="bg-white rounded-xl border border-neutral-200">
+              <div key={t.i} className="bg-superficie rounded-xl border border-neutral-200">
                 <div className="flex items-center gap-3 p-3">
                   {/* O label cobre só o checkbox e o texto — o botão de ignorar
                       fica fora, senão clicar nele marcaria a caixinha. */}
@@ -388,7 +388,7 @@ export default function UploadPage() {
                     <div className="flex flex-col sm:flex-row gap-2">
                       <button
                         onClick={() => ignorar(t, "lancamento")}
-                        className="flex-1 text-sm border border-neutral-300 bg-white rounded-lg px-3 py-2 toque text-left"
+                        className="flex-1 text-sm border border-neutral-300 bg-superficie rounded-lg px-3 py-2 toque text-left"
                       >
                         <strong className="block">Só este</strong>
                         <span className="text-xs text-neutral-500">
@@ -397,7 +397,7 @@ export default function UploadPage() {
                       </button>
                       <button
                         onClick={() => ignorar(t, "descricao")}
-                        className="flex-1 text-sm border border-neutral-300 bg-white rounded-lg px-3 py-2 toque text-left"
+                        className="flex-1 text-sm border border-neutral-300 bg-superficie rounded-lg px-3 py-2 toque text-left"
                       >
                         <strong className="block">Sempre que aparecer</strong>
                         <span className="text-xs text-neutral-500 block truncate">

@@ -95,7 +95,7 @@ export default function EditarGastoFixoModal({ transacao, onFechar, onSalvo }) {
         <label className="block mt-3">
           <span className="block text-xs font-medium text-neutral-500 mb-1">A partir de</span>
           <select
-            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-white"
+            className="w-full border border-neutral-300 rounded-lg px-3 py-2 toque bg-superficie"
             value={mesRef}
             onChange={(e) => setMesRef(e.target.value)}
           >

@@ -59,7 +59,9 @@ export default function CronometroDescanso({ segundos, onFechar }) {
 
   return (
     <div className="fixed left-0 right-0 bottom-[56px] z-40 px-3 pb-2">
-      <div className="mx-auto max-w-3xl rounded-xl shadow-lg overflow-hidden bg-neutral-900 text-white">
+      {/* A barra é escura nos dois temas — por isso zinc-900 fixo, e não a
+          escala neutra, que se inverte no tema escuro. */}
+      <div className="mx-auto max-w-3xl rounded-xl shadow-lg overflow-hidden bg-zinc-900 text-white">
         {/* Barra de progresso do descanso */}
         <div className="h-1 bg-white/15">
           <div

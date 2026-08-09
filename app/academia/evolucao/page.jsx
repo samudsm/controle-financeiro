@@ -161,7 +161,7 @@ export default function Evolucao() {
       )}
 
       {/* COMPARAÇÃO COM O PERÍODO ANTERIOR */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4 mb-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4 mb-4">
         <h2 className="font-semibold mb-1">Comparado ao período anterior</h2>
         <p className="text-xs text-neutral-500 mb-3">
           Últimos {comp.dias} dias contra os {comp.dias} anteriores
@@ -183,7 +183,7 @@ export default function Evolucao() {
       </section>
 
       {/* ESTATÍSTICAS GERAIS */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4 mb-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4 mb-4">
         <h2 className="font-semibold mb-3">No período</h2>
         <div className="grid grid-cols-2 gap-2">
           <Stat rotulo="Treinos" valor={geral.treinos} />
@@ -196,7 +196,7 @@ export default function Evolucao() {
       </section>
 
       {/* VOLUME SEMANAL */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4 mb-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4 mb-4">
         <h2 className="font-semibold mb-1">Volume por semana</h2>
         <p className="text-xs text-neutral-500 mb-3">Últimas 8 semanas</p>
         <GraficoColunas
@@ -206,7 +206,7 @@ export default function Evolucao() {
       </section>
 
       {/* VOLUME POR GRUPO MUSCULAR */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4 mb-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4 mb-4">
         <h2 className="font-semibold mb-1">Séries por grupo muscular</h2>
         <p className="text-xs text-neutral-500 mb-3">
           Ajuda a ver qual músculo está recebendo mais ou menos estímulo
@@ -222,7 +222,7 @@ export default function Evolucao() {
       </section>
 
       {/* CONSISTÊNCIA */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4 mb-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4 mb-4">
         <div className="flex items-baseline justify-between mb-1">
           <h2 className="font-semibold">Consistência</h2>
           <span className="text-sm text-neutral-500">
@@ -257,14 +257,14 @@ export default function Evolucao() {
       </section>
 
       {/* EVOLUÇÃO POR EXERCÍCIO */}
-      <section className="bg-white rounded-xl border border-neutral-200 p-4">
+      <section className="bg-superficie rounded-xl border border-neutral-200 p-4">
         <h2 className="font-semibold mb-3">Evolução por exercício</h2>
 
         <div className="relative mb-3">
           <select
             value={exSelecionado}
             onChange={(e) => setExSelecionado(e.target.value)}
-            className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-white appearance-none toque"
+            className="w-full border border-neutral-300 rounded-lg px-3 py-2.5 bg-superficie appearance-none toque"
           >
             <option value="">Escolha um exercício…</option>
             {exercicios.map((e) => (

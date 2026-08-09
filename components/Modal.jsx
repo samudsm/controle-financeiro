@@ -9,7 +9,7 @@ export default function Modal({ titulo, onFechar, children, rodape }) {
         if (e.target === e.currentTarget) onFechar();
       }}
     >
-      <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[92vh] flex flex-col shadow-xl">
+      <div className="bg-superficie w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[92vh] flex flex-col shadow-xl">
         <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200">
           <h2 className="font-semibold">{titulo}</h2>
           <button onClick={onFechar} className="text-neutral-400 p-1" aria-label="Fechar">
